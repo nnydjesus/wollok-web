@@ -97,6 +97,6 @@
     "redux-thunk": "^2.1.0",
     "tinycolor2": "^1.4.1",
     "url-loader": "^0.5.7",
-    "wollok-js": "../wollok-js"
+    "wollok-js": "https://github.com/nnydjesus/wollok-js.git"
   }
 }
