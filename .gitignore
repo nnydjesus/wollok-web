@@ -1,0 +1,11 @@
+.idea
+*.iml
+node_modules/
+dist/
+npm-debug.log
+.DS_Store
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

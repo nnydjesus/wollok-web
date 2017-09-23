@@ -1,0 +1,186 @@
+.Resizer {
+    background: #000;
+    opacity: .2;
+    z-index: 1;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding;
+    background-clip: padding-box;
+}
+
+ .Resizer:hover {
+    -webkit-transition: all 2s ease;
+    transition: all 2s ease;
+}
+
+ .Resizer.horizontal {
+    height: 11px;
+    margin: -5px 0;
+    border-top: 5px solid rgba(255, 255, 255, 0);
+    border-bottom: 5px solid rgba(255, 255, 255, 0);
+    cursor: row-resize;
+    width: 100%;
+}
+
+.Resizer.horizontal:hover {
+    border-top: 5px solid rgba(0, 0, 0, 0.5);
+    border-bottom: 5px solid rgba(0, 0, 0, 0.5);
+}
+
+.Resizer.vertical {
+    width: 11px;
+    margin: 0 -5px;
+    border-left: 5px solid rgba(255, 255, 255, 0);
+    border-right: 5px solid rgba(255, 255, 255, 0);
+    cursor: col-resize;
+}
+
+.Resizer.vertical:hover {
+    border-left: 5px solid rgba(0, 0, 0, 0.5);
+    border-right: 5px solid rgba(0, 0, 0, 0.5);
+}
+.Resizer.disabled {
+  cursor: not-allowed;
+}
+.Resizer.disabled:hover {
+  border-color: transparent;
+}
+
+#wollok-content{
+    height: 100vh;
+    
+    .ide-container{
+        width: 100%;
+        height: 100%;
+        background: $background_color;
+        color: $default_text_color;
+
+        .header{
+            height: $header_height;
+            width: 100%;
+            background-color: $header_color;
+
+            .toolbar{
+                display: inline-flex;
+                width: 100%;
+                height: 100%;
+                padding-left: 20px;
+
+                .material-icons{
+                    color: $toolbar_icon_color;
+                    font-size: 18px;
+                }
+
+                .separator{
+                    width: 1px;
+                    height: 14px;
+                    background-color: $toolbar_icon_separator_color;
+                    margin-bottom: 7px;
+                    margin-right: 10px;
+                    margin-top: 7px;
+                }
+            }
+        }
+
+        .SplitPane { 
+            height: calc(100vh - $header_height )!important;
+            height: -webkit-calc(100vh - $header_height )!important;
+            height: -moz-calc(100vh - $header_height )!important;
+        }
+
+        .ace_editor {
+            border-style: none !important;
+            border-radius: 3px;
+            border-collapse: collapse;
+            width: 100%!important;
+            height: 100vh;
+            height: calc(100% - 35px) !important;
+            height: -webkit-calc(100% - 35px) !important;
+            height: -moz-calc(100% - 35px) !important;
+        }
+
+        .tabs{
+            // height: 40px;
+
+            .file{
+                cursor: default;
+                
+                .close-icon{
+                    cursor: pointer;
+                    margin-right: 5px;
+                    font-size: 20px;
+                    vertical-align: middle;
+                }
+
+                .dirty-icon{
+                    margin-right: 5px;
+                    margin-left: 5px;
+                    font-size: 15px;
+                }
+            }
+
+            section{
+                padding: 0px;
+            }
+
+            .wollok-icon{
+                display: inline;
+            }
+
+            .wollok-label{
+                text-transform: none;
+                line-height: 20px;
+                padding-bottom: 5px;
+                padding-top: 5px;
+                color: $default_text_color;
+            }
+        }
+
+        .left-panel{
+            background-color: $background_color;
+
+            .left-panel-header{
+                height: $tab_file_height;
+            }
+            .left-panel-top{
+                width: 100%;
+            }
+
+            .file-browser{
+                height: calc(100% - $tab_file_height);
+                height: -webkit-calc(100% - $tab_file_height);
+                height: -moz-calc(100% - $tab_file_height);
+                width: 100%;
+
+                .file-browser-tree{
+                    width: 100%;
+                    display: 'inline-block';
+                    vertical-align: 'top';
+                    padding: '20px';
+
+                    .search{
+                        color: white;
+                        padding: 0px;
+                        margin-left: 35px;
+                        margin-bottom: 10px;
+                    }
+
+
+                    input{
+                        color: white;
+                        font-size: 20px;
+                    }
+
+                    .material-icons{
+                        color: white;
+                        top: -2px;
+                        left: -43px;
+                    }
+                }
+
+            }
+        }
+    }
+}

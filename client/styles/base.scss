@@ -1,0 +1,139 @@
+body {
+  margin: 0;
+  font-family: Roboto, sans-serif;
+  background-color: #dddddd;
+  height: 100vh;
+  overflow-y: hidden;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.center {
+  margin: auto;
+  text-align: center;
+  width: 100%;
+}
+
+.right {
+  margin: 0 0 0 auto;
+  text-align: right;
+  width: 100%;
+}
+
+.gray-bg {
+  background-color: #aaaaaa;
+}
+
+.gray-bg:hover {
+  background-color: #eeeeee;
+}
+
+.top-snackbar {
+  position: fixed;
+  top: 0;
+  margin-top: 0;
+  bottom: auto;
+  margin-bottom: auto;
+  transition: all .35s cubic-bezier(0.4, 0, 0.2, 1) .35s;
+  &:not(.active) {
+    transform: translateY(-100%);
+  }
+  &.active {
+    transform: translateY(0%);
+  }
+}
+
+.buttons {
+  @extend .right;
+  margin-top: 0.5rem;
+
+  div {
+    display: inline;
+  }
+
+  div.hidden {
+    display: none;
+  }
+
+  button {
+    margin-left: 1rem;
+    
+    div {
+      display: block;
+    }
+  }
+}
+
+.user-picture {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background-size: cover;
+}
+
+.md-36 {
+  font-size: 36px !important;
+}
+
+.user-identity {
+  margin-right: 9px;
+}
+
+.user-menu {
+  margin-top: 52px;
+  margin-right: -12px;
+}
+
+.show {
+  animation: show 1s linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes show {
+  0% {
+    display: none;
+    opacity: 0;
+  }
+  1% {
+    display: block;
+  }
+  100% {
+    display: block;
+    opacity: 1;
+  }
+}
+
+.hide {
+  animation: hide 1s linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes hide {
+  0% {
+    display: block;
+    opacity: 1;
+  }
+  99% {
+    display: block;
+  }
+  100% {
+    display: none;
+    opacity: 0;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.default-font {
+  font-family: Montserrat, Roboto, Arial, Helvetica, sans-serif;
+}
+
+
+$font_size_mobile : 25px;
+$font_size : 15px;
+
+@import "wollok/styles.scss";
