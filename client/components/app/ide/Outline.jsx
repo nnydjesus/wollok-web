@@ -2,25 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom'
 import {connect} from 'react-redux';
 import {Treebeard, decorators} from 'react-treebeard';
-
-// Example: Customising The Header Decorator To Include Icons
-const outlineDecorator = {
-  Loading: decorators.Loading,
-  Toggle: decorators.Toggle,
-  Container: decorators.Container,
-  Header : ({style, node}) => {
-    const iconStyle = {marginRight: '5px'};
-  
-    return (
-        <div style={style.base}>
-            <div style={style.title}>
-                <i className={"icon-file wollok-"+node.extension} style={iconStyle}/>
-                {node.name}
-            </div>
-        </div>
-    );
-  }
-};
+import treebeardStyle from './treebeardStyle'
 
 class OutlineComponent extends Component {
   constructor(props) {
@@ -29,17 +11,42 @@ class OutlineComponent extends Component {
     this.state = {
       tree: this.converASTToTree(this.props.ast, this.props.file)
     };
+
+    this.outlineDecorator = {
+      Loading: decorators.Loading,
+      Toggle: decorators.Toggle,
+      Container: decorators.Container,
+      Header : ({style, node}) => {
+        const iconStyle = {marginRight: '5px'};
+      
+        return (
+            <div style={style.base} >
+                <div style={style.title} className="outline_node" onClick={this.onSelectNode(node)}>
+                    <i className={"icon-file wollok-"+node.type} style={iconStyle}/>
+                    {node.name}
+                </div>
+            </div>
+        );
+      }
+    };
+  }
+
+  onSelectNode = (node) => (event)=>{
+    // event.stopPropagation()
+    // event.nativeEvent.stopImmediatePropagation()
+    this.clickOnText = true
+    this.props.onSelect(node.ast)
   }
 
   
   onToggle = (node, toggled) => {
     if(this.state.cursor){this.state.cursor.active = false;}
     node.active = true;
-    if(node.children){
+
+    if(!this.clickOnText && node.children){
        node.toggled = toggled; 
-    }else{
-      this.props.onSelect(node.ast)
     }
+    this.clickOnText = false
     this.setState({ cursor: node }); 
   }
 
@@ -58,32 +65,84 @@ class OutlineComponent extends Component {
       name: file.name,
       toggled: true,
       ast:file.ast,
-      extension: "file",
+      type: "file",
       children: file.ast.content.map( child=>{
-        return {
-          name: child.name,
-          toggled: true,
-          children: child.members.map(this.convertMembers),
-          extension: "object",
-          ast:child
+        switch(child.type){
+          case "Program": return {
+            name: child.name || child.description.value,
+            toggled: true,
+            children: child.sentences.sentences.map(this.convertMembers),
+            type: "program",
+            ast:child
+          }
+          case "Singleton": return {
+            name: child.name,
+            toggled: true,
+            children: child.members.filter(ast=> ast.type != "Constructor").map(this.convertMembers),
+            type: "object",
+            ast:child
+          }
+          case "Class": return {
+            name: child.name,
+            toggled: true,
+            children: child.members.filter(ast=> ast.type != "Constructor").map(this.convertMembers),
+            type: "class",
+            ast:child
+          }
+
+          case "Test": return {
+            name: child.name || child.description.value,
+            toggled: true,
+            children: child.sentences.sentences.map(this.convertMembers),
+            type: "test",
+            ast:child
+          }
+
+          case "Import": return {
+            name: child.target,
+            toggled: true,
+            type: "import",
+            ast:child
+          }
+
         }
       })
     }
     return node
   }
 
+
+
   convertMembers = (ast) =>{
     switch(ast.type){
       case "Field": return {
         name: "var " + ast.variable.name.token,
-        extension: "variable",
+        type: "variable",
         ast:ast
       }
       case "Method": return {
-        name: ast.name+"("+ ast.parameters.map(param=> param.name).join(",")+")",
-        extension: "method",
+        name: ast.name+"("+ ast.parameters.map(param=> this.parameterName(param)).join(",")+")",
+        type: "method",
         ast:ast
       }
+      case "Send": return {
+        name: ast.key+"("+ ast.parameters.map(param=> this.parameterName(param)).join(",")+")",
+        type: "message",
+        ast:ast
+      }
+      case "VariableDeclaration": return {
+        name: ast.variable.name.token,
+        type: "variable",
+        ast:ast
+      }
+    }
+  }
+
+  parameterName(param){
+    switch(param.type){
+      case "Reference": return param.name.type == "Link"? param.name.token : param.name 
+      case "Literal": return param.value 
+      case "Send": return param.key+"("+ param.parameters.map(param=> this.parameterName(param)).join(",")+")"
     }
   }
 
@@ -91,11 +150,12 @@ class OutlineComponent extends Component {
 
   render() {
     return (
-      <div  className="file-browser-tree">
+      <div  className="outline">
         <Treebeard
           data={this.state.tree}
-          decorators={outlineDecorator}
+          decorators={this.outlineDecorator}
           onToggle={this.onToggle}
+          style ={treebeardStyle}
         />
       </div>
     );

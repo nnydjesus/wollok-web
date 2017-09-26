@@ -48,6 +48,7 @@
   border-color: transparent;
 }
 
+
 #wollok-content{
     height: 100vh;
     
@@ -56,6 +57,10 @@
         height: 100%;
         background: $background_color;
         color: $default_text_color;
+
+        .splitter .pane:last-child{
+            overflow-y: auto;
+        }
 
         .header{
             height: $header_height;
@@ -71,6 +76,13 @@
                 .material-icons{
                     color: $toolbar_icon_color;
                     font-size: 18px;
+                }
+
+                .icon_container{
+                    position: relative;
+                    .icon_link{
+                        height: 100%;
+                    }
                 }
 
                 .separator{
@@ -179,7 +191,12 @@
                         left: -43px;
                     }
                 }
+            }
 
+            .outline{
+                .outline_node{
+                    white-space: nowrap;
+                }
             }
         }
     }

@@ -22,6 +22,40 @@ import theme from '../../../../resources/theme.jsx';
 import Splitter from 'm-react-splitters';
 import 'm-react-splitters/lib/splitters.css';
 
+const defaultProject = {
+    name: 'ejemplo',
+    toggled: true,
+    extension:"directory",
+    children: [
+        { name: 'aves.wlk', dirty:true, text:`object contador {
+var valor = 0
+
+method inc() { 
+valor +=  1  
+}
+
+}
+`,                   extension:"wlk"},
+        { name: 'aves.wtest', dirty:false,  text:`object pepita  {
+var energia = 100 * (44 / 232)
+var nombre = "Pepa"
+
+method comer(gramos) {
+energia += 4
+}
+
+method volar(km) {
+energia -= (10 + km)
+}
+
+method energia() { return energia }
+
+method estaFeliz() { return self.energia().between(50,1000) }
+}   
+`,               extension:"wtest"},
+    ]
+}
+
 class IDEComponent extends Component {
 
     constructor(props) {
@@ -29,39 +63,7 @@ class IDEComponent extends Component {
         this.state = {
             openFiles:[],
             tabIndex: 1,
-            project: {
-                name: 'pepita',
-                toggled: true,
-                extension:"directory",
-                children: [
-                    { name: 'contador.wlk', dirty:true, text:`object contador {
-    var valor = 0
-
-    method inc() { 
-        valor +=  1  
-    }
-
-}
-`,                   extension:"wlk"},
-                    { name: 'example.wlk', dirty:false,  text:`object pepita  {
-    var energia = 100 * (44 / 232)
-    var nombre = "Pepa"
-
-    method comer(gramos) {
-        energia += 4
-    }
-
-    method volar(km) {
-        energia -= (10 + km)
-    }
-
-    method energia() { return energia }
-
-    method estaFeliz() { return self.energia().between(50,1000) }
-}   
-`,               extension:"wlk"},
-                ]
-            }
+            project: JSON.parse(sessionStorage.getItem("project") || JSON.stringify(defaultProject))
         };
     }
 
@@ -88,6 +90,8 @@ class IDEComponent extends Component {
         }catch(e){
             file.ast = undefined
         }
+
+        sessionStorage.setItem("project", JSON.stringify(this.state.project))
         
         this.setState({file})
         // var jsCode = compiler(ast)
@@ -135,9 +139,10 @@ class IDEComponent extends Component {
         }
     }
 
-    newFile =() =>{
+    newFile =(file) =>{
         var project = this.state.project
-        project.children.push({ name: 'newFile.wlk', dirty:false, text:"", extension:"wlk", new:true})
+        project.children.push(file)
+        sessionStorage.setItem("project", JSON.stringify(this.state.project))
         this.setState(project)
     }
 
@@ -151,7 +156,7 @@ class IDEComponent extends Component {
         return (
             <div className="ide-container">
                 <div className="header">
-                    <Toolbar runCode={this.runCode} runCommand={this.runCommand} newFile={this.newFile} saveFile={this.onSaveFile}/>
+                    <Toolbar runCode={this.runCode} runCommand={this.runCommand} newFile={this.newFile} saveFile={()=> this.onSaveFile()}/>
                 </div>
                 <Splitter position="vertical" 
                     primaryPaneMaxWidth="30%"
@@ -165,7 +170,11 @@ class IDEComponent extends Component {
                             </div>
                         </div>
                         <div >
-                            <Outline file={this.state.file} onSelect={this.handleOutline} />
+                            <Tabs theme={this.props.theme} index={0} className="tabs">
+                                <Tab label='Outline' active={true}>
+                                    <Outline file={this.state.file} onSelect={this.handleOutline} />
+                                </Tab>
+                            </Tabs>
                         </div>
                     </Splitter>
 
@@ -186,7 +195,11 @@ class IDEComponent extends Component {
                             {this.state.file && <EditorComponent ref="editor" mode="wollok" name="editor" value={this.state.file.text} onChange={ this.updateCode } onSave={this.onSaveFile}/>}
                            
                         </div>
-                        <div >asdfasdf</div>
+                        <Tabs theme={this.props.theme} index={0} className="tabs">
+                            <Tab label='Consola' active={true}>
+                                
+                            </Tab>
+                        </Tabs>
                     </Splitter>
                 </Splitter>
             </div>

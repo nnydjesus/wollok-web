@@ -16,7 +16,6 @@ class EditorComponent extends Component {
     }
 
     goToLine(line){
-        this.editor.scrollToLine(line, true, true);
         this.editor.gotoLine(line, 0, true);
     }
 
@@ -50,7 +49,7 @@ class EditorComponent extends Component {
                 name={this.props.name}
                 showPrintMargin={false}
                 fontSize={14}
-                editorProps={{$blockScrolling: true}}
+                editorProps={{$blockScrolling: "Infinity"}}
                 setOptions={{
                     enableBasicAutocompletion: true,
                     enableLiveAutocompletion: true,

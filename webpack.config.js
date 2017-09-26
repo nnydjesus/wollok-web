@@ -108,7 +108,8 @@ var config = {
         include: /(node_modules)\/react-toolbox/
       },
       { test: /\.png$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/png" } },
-      { test: /\.jpe?g$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/jpeg" } }
+      { test: /\.jpe?g$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/jpeg" } },
+      { test: /\.gif$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/gif" } }
     ]
   },
   node: {

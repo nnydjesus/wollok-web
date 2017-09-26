@@ -155,6 +155,10 @@
   }
 
   .file-wtest {
+    background-image: url(../../public/images/files/wtest.png);
+  }
+
+  .file-wpgm {
     background-image: url(../../public/images/files/wollok.png);
   }
 
@@ -316,6 +320,12 @@
   .wollok-test {
     background-image: url(../../public/images/ast/test.png);
   }
+  .wollok-message {
+    background-image: url(../../public/images/ast/message.png);
+  }
   .wollok-program {
     background-image: url(../../public/images/ast/program.png);
+  }
+  .wollok-import {
+    background-image: url(../../public/images/ast/import.gif);
   }
