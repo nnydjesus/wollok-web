@@ -11,7 +11,8 @@ class EditorComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            code:""
+            code:"",
+            lines:[]
         };
     }
 
@@ -39,6 +40,16 @@ class EditorComponent extends Component {
     }
 
     render() {
+        var annotations = []
+        if(this.props.error){
+            var error = this.props.error
+            annotations.push({
+                row: error.location.start.line-1,
+                column: error.location.start.column,
+                text: error.message,
+                type: "error" // also warning and information
+            })
+        }
         return (
             <AceEditor
                 ref="aceEditor"
@@ -50,6 +61,7 @@ class EditorComponent extends Component {
                 showPrintMargin={false}
                 fontSize={14}
                 editorProps={{$blockScrolling: "Infinity"}}
+                annotations = {annotations}
                 setOptions={{
                     enableBasicAutocompletion: true,
                     enableLiveAutocompletion: true,

@@ -48,6 +48,13 @@
   border-color: transparent;
 }
 
+.fullHeight{
+    height: 100%;
+    section{
+        height: 100%;
+    }
+}
+
 
 #wollok-content{
     height: 100vh;
@@ -63,6 +70,8 @@
         }
 
         .header{
+            position: fixed;
+            top: 0px;
             height: $header_height;
             width: 100%;
             background-color: $header_color;
@@ -94,6 +103,11 @@
                     margin-top: 7px;
                 }
             }
+        }
+        
+        .body{
+            position: relative;
+            top: 30px;
         }
 
         .SplitPane { 
@@ -148,6 +162,32 @@
                 padding-top: 5px;
                 color: $default_text_color;
             }
+
+            .console{
+                height: 100%;
+                width: 100%;
+                background: white;
+                color: $console_text_color;
+
+                div.react-console-container{
+                    width: 100%;
+                    height: 100%;
+                    background: $console_background;
+                }
+
+                .react-console-message-error{
+                    color: $console_error_message;
+                }
+
+                .display{
+                    p {
+                        margin: 5px;
+                    }
+                }
+
+            }
+
+            
         }
 
         .left-panel{

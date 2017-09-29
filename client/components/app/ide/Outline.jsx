@@ -135,6 +135,12 @@ class OutlineComponent extends Component {
         type: "variable",
         ast:ast
       }
+
+      case "Reference": return {
+        name: ast.name.type == "Link"? ast.name.token: ast.name ,
+        type: "variable",
+        ast:ast
+      }
     }
   }
 

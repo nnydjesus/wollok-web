@@ -109,7 +109,8 @@ var config = {
       },
       { test: /\.png$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/png" } },
       { test: /\.jpe?g$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/jpeg" } },
-      { test: /\.gif$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/gif" } }
+      { test: /\.gif$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/gif" } },
+      { test: /\.txt$/, use: 'raw-loader' }
     ]
   },
   node: {

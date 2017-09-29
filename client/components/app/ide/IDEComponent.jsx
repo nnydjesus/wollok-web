@@ -17,10 +17,14 @@ import EditorComponent from './EditorComponent.jsx'
 import FileBrowser from './FileBrowser.jsx'
 import Outline from './Outline.jsx'
 import Toolbar from './Toolbar.jsx'
-import { compiler, parser, linker,wre, interpreter} from 'wollok-js'
+import Console from './Console.jsx'
+import validator from './validator.js'
+import runner from './runner.js'
 import theme from '../../../../resources/theme.jsx';
 import Splitter from 'm-react-splitters';
 import 'm-react-splitters/lib/splitters.css';
+import 'react-console-component/main.css';
+
 
 const defaultProject = {
     name: 'ejemplo',
@@ -63,7 +67,8 @@ class IDEComponent extends Component {
         this.state = {
             openFiles:[],
             tabIndex: 1,
-            project: JSON.parse(sessionStorage.getItem("project") || JSON.stringify(defaultProject))
+            project: JSON.parse(sessionStorage.getItem("project") || JSON.stringify(defaultProject)),
+            astError:undefined,
         };
     }
 
@@ -85,21 +90,20 @@ class IDEComponent extends Component {
     onSaveFile = (aFile) =>{
         let file = aFile || this.state.file
         file.dirty = false
+        var astError = undefined
         try{
-            file.ast = this.compileFile(file)
+            file.ast = runner.parse(file.text)
         }catch(e){
             file.ast = undefined
+            astError = validator.addContextInfo(e)
         }
 
         sessionStorage.setItem("project", JSON.stringify(this.state.project))
         
-        this.setState({file})
+        this.setState({file, astError})
         // var jsCode = compiler(ast)
     }
 
-    compileFile(file){
-        return linker(parser(file.text))
-    }
 
     handleOutline = (node) =>{
         if(node.location){
@@ -132,10 +136,13 @@ class IDEComponent extends Component {
     }
 
     runCode = () =>{
-        if(this.state.file){
+        if(this.state.file && this.state.file.ast){
+            this.refs.console.runFile(this.state.file)
             // console.log(interpreter(wre)(this.state.file.ast))
-            window.code = compiler(this.state.file.ast, wre)
-            eval.call(wre, window.code)
+            // var code = runner.compile(this.state.file.ast)
+            // eval(scope+"; "+ code)
+            // with(scope) eval(window.code)
+
         }
     }
 
@@ -150,7 +157,7 @@ class IDEComponent extends Component {
         if(this.refs.editor){
             this.refs.editor.runCommand(command)
         }
-      }
+    }
 
     render() {
         return (
@@ -159,6 +166,7 @@ class IDEComponent extends Component {
                     <Toolbar runCode={this.runCode} runCommand={this.runCommand} newFile={this.newFile} saveFile={()=> this.onSaveFile()}/>
                 </div>
                 <Splitter position="vertical" 
+                    className="body"
                     primaryPaneMaxWidth="30%"
                     primaryPaneMinWidth="200px"
                     primaryPaneWidth="250px"
@@ -192,12 +200,15 @@ class IDEComponent extends Component {
                                         </span> } 
                                     className="file" onActive={this.onSelectTab(file) } /> )}
                             </Tabs>
-                            {this.state.file && <EditorComponent ref="editor" mode="wollok" name="editor" value={this.state.file.text} onChange={ this.updateCode } onSave={this.onSaveFile}/>}
+                            {this.state.file && <EditorComponent ref="editor" mode="wollok" name="editor" value={this.state.file.text} error={this.state.astError} onChange={ this.updateCode } onSave={this.onSaveFile}/>}
                            
                         </div>
-                        <Tabs theme={this.props.theme} index={0} className="tabs">
-                            <Tab label='Consola' active={true}>
-                                
+                        <Tabs theme={this.props.theme} index={0} className="tabs fullHeight ">
+                            <Tab label='Consola' active={true} >
+                                <Console 
+                                    ref="console"
+                                    handler={this.handleConsole}
+                                />
                             </Tab>
                         </Tabs>
                     </Splitter>
