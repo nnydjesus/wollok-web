@@ -37,6 +37,8 @@ export default {
     addContextInfo: function(exception){
         if(exception.expected.find(error=> error.text == "}")){
             exception.message = "Te Falta cerrar la }"
+        }else if(exception.expected.find(error=> error.text == ")")){
+            exception.message = "Te Falta cerrar la )"
         }
         return exception
     }

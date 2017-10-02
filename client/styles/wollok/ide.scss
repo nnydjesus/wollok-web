@@ -58,6 +58,10 @@
 
 #wollok-content{
     height: 100vh;
+
+    .pane{
+        border: 0.1px solid;
+    }
     
     .ide-container{
         width: 100%;
@@ -108,6 +112,7 @@
         .body{
             position: relative;
             top: 30px;
+            padding-bottom: 30px;
         }
 
         .SplitPane { 
@@ -163,10 +168,34 @@
                 color: $default_text_color;
             }
 
+            .wollok-pointer{
+                display: none;
+            }
+
+            nav {
+                box-shadow: none;
+                .wollok-active{
+                    background: #141414;
+                    border-style: solid;
+                    border-width: 1px 1px 0px 1px;
+                    border-color: gray;
+                    border-radius: 10px 10px 0px 0px;
+                    cursor: default;
+                }
+            }
+
+            .console-icon-stop{
+                margin-right: 5px;
+                color: $error_color;
+                display: inline-block;
+                vertical-align: middle;
+                cursor: pointer;
+            }
+
             .console{
                 height: 100%;
                 width: 100%;
-                background: white;
+                background: $background;
                 color: $console_text_color;
 
                 div.react-console-container{
@@ -184,10 +213,32 @@
                         margin: 5px;
                     }
                 }
+            }
 
+            .problems{
+                background: $background;
+                color: $console_text_color;
+                height: 100%;
+                overflow-y: auto;
+
+                .description{
+                    margin: 0px;
+                    padding: 5px;
+                    padding-left: 15px;
+                }
             }
 
             
+        }
+
+        .bottom-tabs{
+
+            nav {
+                .wollok-active{
+                    background: $console_background;
+                    color: $console_text_color;
+                }
+            }
         }
 
         .left-panel{

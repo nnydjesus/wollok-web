@@ -4,6 +4,7 @@ import 'brace/mode/wollok'
 import 'brace/theme/twilight'
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
+import {File} from './model'
  
 
 class EditorComponent extends Component {
@@ -11,7 +12,7 @@ class EditorComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            code:"",
+            annotations: this.annotationsForFile(props.file),
             lines:[]
         };
     }
@@ -21,6 +22,7 @@ class EditorComponent extends Component {
     }
 
     onSave = () =>{
+        // this.props.file.text = this.state.file.text
         if(this.props.onSave) this.props.onSave()
     }
 
@@ -39,35 +41,48 @@ class EditorComponent extends Component {
         this.editor.execCommand(command)
     }
 
-    render() {
+    annotationsForFile(file){
         var annotations = []
-        if(this.props.error){
-            var error = this.props.error
-            annotations.push({
-                row: error.location.start.line-1,
-                column: error.location.start.column,
-                text: error.message,
-                type: "error" // also warning and information
-            })
+        if(file.errors){
+            file.errors.forEach(error =>
+                annotations.push({
+                    row: error.location.start.line-1,
+                    column: error.location.start.column,
+                    text: error.message,
+                    type: "error" // also warning and information
+                })
+            )
         }
+        return annotations
+    }
+
+    componentDidUpdate(){
+        if(this.refs.aceEditor && this.props.file){
+            this.editor.getSession().setAnnotations(this.annotationsForFile(this.props.file))
+        }
+    }
+
+    render() {
+       
+        if(!this.props.file){ return <div/>}
         return (
             <AceEditor
                 ref="aceEditor"
                 mode={this.props.mode || 'wollok'}
                 theme={this.props.theme || 'twilight'}
                 onChange={this.props.onChange}
-                value={this.props.value}
+                value={this.props.file.text}
                 name={this.props.name}
                 showPrintMargin={false}
                 fontSize={14}
-                editorProps={{$blockScrolling: "Infinity"}}
-                annotations = {annotations}
+                annotations={this.state.annotations}
+                editorProps={{$blockScrolling: "Infinity", $useWorker:false}}
                 setOptions={{
                     enableBasicAutocompletion: true,
                     enableLiveAutocompletion: true,
                     enableSnippets: true,
                     showLineNumbers: true,
-                    tabSize: 2
+                    tabSize: 2,
                 }}
                 commands={[
                     {
@@ -84,7 +99,7 @@ class EditorComponent extends Component {
 
 EditorComponent.propTypes = {
     mode: PropTypes.string,
-    value: PropTypes.string,
+    file: PropTypes.object,
     onChange: PropTypes.func,
     onSave: PropTypes.func,
 };

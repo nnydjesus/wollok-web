@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom'
 import {connect} from 'react-redux';
 import { Input } from 'react-toolbox/lib/input';
 import {Treebeard, decorators} from 'react-treebeard';
+import treebeardStyle from './treebeardStyle'
+
 
 const defaultMatcher = (filterText, node) => {
   return node.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1;
@@ -98,6 +100,7 @@ class FileBrowserComponent extends Component {
           data={this.state.data}
           decorators={decorators}
           onToggle={this.onToggle}
+          style ={treebeardStyle}
         />
       </div>
     );

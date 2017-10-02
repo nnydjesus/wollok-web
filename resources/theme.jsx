@@ -63,7 +63,8 @@ const theme = {
         icon: "wollok-icon",
         snackbar: "wollok-snackbar",
         pinned: "wollok-pinned", // pinned sidebar
-        emailLoginActive: "false"
+        emailLoginActive: "false",
+        pointer: "wollok-pointer"
     },
     "wollok-login": {
         layout: "wollok-layout",

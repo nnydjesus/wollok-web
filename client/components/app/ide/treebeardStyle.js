@@ -4,7 +4,6 @@ export default {
     tree: {
         base: {
             listStyle: 'none',
-            backgroundColor: '#21252B',
             margin: 0,
             padding: 0,
             color: '#9DA5AB',
@@ -20,7 +19,9 @@ export default {
                 position: 'relative',
                 padding: '0px 5px',
                 display: 'block',
-                whiteSpace: "nowrap"
+                whiteSpace: "nowrap",
+                marginRight: "1px",
+                marginLeft: "1px"
             },
             activeLink: {
                 background: '#31363F'

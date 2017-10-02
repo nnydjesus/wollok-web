@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import Console from 'react-console-component';
 import runner from './runner';
- 
+import 'react-console-component/main.css';
 
 class ConsoleComponent extends Component {
 
@@ -9,6 +9,7 @@ class ConsoleComponent extends Component {
         super(props);
         this.state = {
             lines:["La consola no esta disponible"],
+            runnable:false
         };
     }
 
@@ -20,6 +21,13 @@ class ConsoleComponent extends Component {
     runFile(file){
         var mode;
         var lines = this.state.lines
+        var running = false
+        if(this.refs.console){
+            this.refs.console.setState({
+                acceptInput: true,
+                log: []
+            });
+        }
         switch(file.extension){
             case "wlk": mode = "repl";
                 lines = []
@@ -27,6 +35,7 @@ class ConsoleComponent extends Component {
                     this.refs.console.log(value.toString());
                     this.refs.console.return();
                 }
+                running = true
                 break;
             case "wpgm": mode = "result";
                 lines = []
@@ -49,8 +58,15 @@ class ConsoleComponent extends Component {
             file:file,
             ast:file.ast,
             mode:mode,
+            runnable:running,
+            running,
             lines
         })
+        this.props.updateStatus({running})
+    }
+
+    get running(){
+        return this.state.running 
     }
 
     runProgram(file){
@@ -65,16 +81,24 @@ class ConsoleComponent extends Component {
         }
     }
 
-    stop(){
+    stop = () =>{
         this.setState({
             ast:undefined,
-            lines:[]
+            mode:"",
+            running:false
         })
+        this.refs.console.setState({
+            acceptInput: false,
+        });
+        this.props.updateStatus({running:false})
     }
 
+
     handleConsole = (text) =>{
+        if(this.state.mode != "repl"){ return }
         if(text == "quit"){
             this.stop()
+            return 
         }
         var program = " program repl { \n ";
         program += this.state.lines.join("\n") + " return "+ text
@@ -102,11 +126,11 @@ class ConsoleComponent extends Component {
     render() {
         return (
             <div className="console">
-                {(this.state.ast && this.state.mode == "repl")?
+                {(this.state.runnable)?
                 <Console ref="console"
                     handler={this.handleConsole}
                     promptLabel=">>> "
-                    welcomeMessage={'Wollok interactive console (type "quit" to quit):'}
+                    welcomeMessage={`Ejecutando el archivo ${this.state.file.name} \nWollok interactive console (type "quit" to quit):`}
                     autofocus={true}
                 />
                 : <div className="display"> {this.state.lines.map((line, index) => <p key={index}>{line} </p>)}</div>

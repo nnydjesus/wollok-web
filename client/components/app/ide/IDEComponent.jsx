@@ -17,13 +17,15 @@ import EditorComponent from './EditorComponent.jsx'
 import FileBrowser from './FileBrowser.jsx'
 import Outline from './Outline.jsx'
 import Toolbar from './Toolbar.jsx'
+import {File, Project} from './model.js'
 import Console from './Console.jsx'
+import Problems from './Problems.jsx'
 import validator from './validator.js'
 import runner from './runner.js'
 import theme from '../../../../resources/theme.jsx';
 import Splitter from 'm-react-splitters';
 import 'm-react-splitters/lib/splitters.css';
-import 'react-console-component/main.css';
+
 
 
 const defaultProject = {
@@ -60,20 +62,32 @@ method estaFeliz() { return self.energia().between(50,1000) }
     ]
 }
 
+const ErrorModel = {
+    descriptrion: {type: String},
+    file: {type: String},
+    birthdate: {type: Date},
+    cats: {type: Number},
+    dogs: {type: Number},
+    active: {type: Boolean}
+  };
+
 class IDEComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             openFiles:[],
-            tabIndex: 1,
-            project: JSON.parse(sessionStorage.getItem("project") || JSON.stringify(defaultProject)),
-            astError:undefined,
+            editorTabIndex: 0,
+            project: new Project(JSON.parse(sessionStorage.getItem("project") || JSON.stringify(defaultProject))),
+            bottomTabIndex:0,
+            runningConsole:false
         };
     }
 
-    handleTabChange = (tabIndex) => {
-        this.setState({tabIndex});
+    handleTabChange = (tabType) => (tabIndex) => {
+        var newState = {}
+        newState[tabType] = tabIndex
+        this.setState(newState);
     };
 
     onSelectTab = (file) => () =>{
@@ -87,26 +101,24 @@ class IDEComponent extends Component {
         this.setState({file})
     }
 
+    updateConsoleStatus = (status) =>{
+        this.setState({runningConsole: status.running})
+    }
+
     onSaveFile = (aFile) =>{
         let file = aFile || this.state.file
         file.dirty = false
-        var astError = undefined
-        try{
-            file.ast = runner.parse(file.text)
-        }catch(e){
-            file.ast = undefined
-            astError = validator.addContextInfo(e)
-        }
+        file.parse()
 
         sessionStorage.setItem("project", JSON.stringify(this.state.project))
         
-        this.setState({file, astError})
+        this.setState({file})
         // var jsCode = compiler(ast)
     }
 
 
     handleOutline = (node) =>{
-        if(node.location){
+        if(node.location && this.refs.editor){
             this.refs.editor.goToLine(node.location.start.line)
         }
 
@@ -116,7 +128,7 @@ class IDEComponent extends Component {
         return () =>{
             let newState = {openFiles:this.state.openFiles.filter( f=> f.name != file.name)}
             newState.file = _.last(newState.openFiles)
-            newState.tabIndex = newState.openFiles.length-1
+            newState.editorTabIndex = newState.openFiles.length-1
             
             this.setState(newState);    
         }
@@ -127,16 +139,17 @@ class IDEComponent extends Component {
         if(index<0){
             let files = this.state.openFiles
             files.push(file)
-            this.setState({openFiles:files, file,  tabIndex:files.length-1});
+            this.setState({openFiles:files, file,  editorTabIndex:files.length-1});
             this.onSaveFile(file)
         }else{
-            this.setState({file,  tabIndex:index})
+            this.setState({file,  editorTabIndex:index})
             this.onSaveFile()
         }
     }
 
     runCode = () =>{
-        if(this.state.file && this.state.file.ast){
+        if(this.state.file && this.state.file.isRunnable()){
+            this.handleTabChange("bottomTabIndex")(0)
             this.refs.console.runFile(this.state.file)
             // console.log(interpreter(wre)(this.state.file.ast))
             // var code = runner.compile(this.state.file.ast)
@@ -144,6 +157,12 @@ class IDEComponent extends Component {
             // with(scope) eval(window.code)
 
         }
+    }
+
+    onSelectError = (error) =>{
+        var file = this.state.project.files.find(file=> file.name == error.file)
+        this.handleSelectFile(file)
+        this.handleOutline(error)
     }
 
     newFile =(file) =>{
@@ -186,12 +205,12 @@ class IDEComponent extends Component {
                         </div>
                     </Splitter>
 
-                    <Splitter position="horizontal"   primaryPaneMaxHeight="90%" primaryPaneHeight="90%" className="primary">
+                    <Splitter position="horizontal"  primaryPaneMaxHeight="90%" primaryPaneHeight="70%" className="primary">
                         <div style={ { width: '100%', height: '100%'}}>
                             {
                                 // <EditorComponent mode="wollok" value={this.state.code} onChange={ (code, event) => this.setState({ ...this.state, code }) } />
                             }
-                            <Tabs theme={this.props.theme} index={this.state.tabIndex} onChange={this.handleTabChange} className="tabs">
+                            <Tabs theme={this.props.theme} index={this.state.editorTabIndex} onChange={this.handleTabChange("editorTabIndex")} className="tabs">
                                 {this.state.openFiles.map( file=> <Tab theme={this.props.theme} icon={<i className={"icon-file file-"+file.extension}></i>} key={file.name} 
                                     label={ 
                                         <span> {file.name}  
@@ -200,15 +219,22 @@ class IDEComponent extends Component {
                                         </span> } 
                                     className="file" onActive={this.onSelectTab(file) } /> )}
                             </Tabs>
-                            {this.state.file && <EditorComponent ref="editor" mode="wollok" name="editor" value={this.state.file.text} error={this.state.astError} onChange={ this.updateCode } onSave={this.onSaveFile}/>}
+                            {this.state.file && <EditorComponent ref="editor" mode="wollok" name="editor" file={this.state.file} onChange={ this.updateCode } onSave={this.onSaveFile}/>}
                            
                         </div>
-                        <Tabs theme={this.props.theme} index={0} className="tabs fullHeight ">
-                            <Tab label='Consola' active={true} >
+                        <Tabs theme={this.props.theme} index={this.state.bottomTabIndex} onChange={this.handleTabChange("bottomTabIndex")} className="tabs bottom-tabs fullHeight "
+                            hideMode="display">
+                            <Tab label={<span>Console  {this.state.runningConsole && <FontIcon value='stop' className="console-icon-stop" onClick={this.refs.console.stop}/>} </span> }
+                                 active={true}  > 
                                 <Console 
                                     ref="console"
                                     handler={this.handleConsole}
+                                    updateStatus={this.updateConsoleStatus}
                                 />
+                            </Tab>
+
+                            <Tab label='Errores'  >
+                                <Problems project={this.state.project} onSelectError={this.onSelectError}/>
                             </Tab>
                         </Tabs>
                     </Splitter>
