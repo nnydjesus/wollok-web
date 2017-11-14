@@ -1,11 +1,11 @@
 import React, {Component, PropTypes} from 'react';
 import AceEditor from 'react-ace'
-import 'brace/mode/wollok'
+import WollokMode from './editor/wollok.js'
+import EditorHandler from './editor/eventHandler.js'
+import {File} from './model'
 import 'brace/theme/twilight'
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
-import {File} from './model'
- 
 
 class EditorComponent extends Component {
 
@@ -24,13 +24,19 @@ class EditorComponent extends Component {
     onSave = () =>{
         // this.props.file.text = this.state.file.text
         if(this.props.onSave) this.props.onSave()
+        this.wollokMode.updateAst(this.props.file.ast)
     }
 
     componentDidMount(){
-        this.editor.on("input", ()=> {
-            // dynamicMode.$highlightRules.setKeywords(JSON.parse(editor2.getValue()))
-            this.editor.session.bgTokenizer.start(0)
-        })()
+        this.wollokMode = new WollokMode();
+        this.editor.getSession().setMode(this.wollokMode);
+        this.editorHandler = new EditorHandler(this.editor)
+        if(this.props.file){
+            this.wollokMode.updateAst(this.props.file.ast)
+            this.editorHandler.updateAst(this.props.file.ast)
+        }
+        // this.wollokMode.updateAst(this.props.file.ast)
+        
     }
 
     get editor() {
@@ -59,6 +65,8 @@ class EditorComponent extends Component {
     componentDidUpdate(){
         if(this.refs.aceEditor && this.props.file){
             this.editor.getSession().setAnnotations(this.annotationsForFile(this.props.file))
+            this.wollokMode.updateAst(this.props.file.ast)
+            this.editorHandler.updateAst(this.props.file.ast)
         }
     }
 
@@ -68,7 +76,6 @@ class EditorComponent extends Component {
         return (
             <AceEditor
                 ref="aceEditor"
-                mode={this.props.mode || 'wollok'}
                 theme={this.props.theme || 'twilight'}
                 onChange={this.props.onChange}
                 value={this.props.file.text}

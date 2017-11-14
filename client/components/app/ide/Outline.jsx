@@ -62,28 +62,28 @@ class OutlineComponent extends Component {
     }
 
     var node = {
-      name: file.name,
+      name: escape(file.name),
       toggled: true,
       ast:file.ast,
       type: "file",
       children: file.ast.content.map( child=>{
         switch(child.type){
           case "Program": return {
-            name: child.name || child.description.value,
+            name: escape(child.name) || escape(child.description.value),
             toggled: true,
             children: child.sentences.sentences.map(this.convertMembers),
             type: "program",
             ast:child
           }
           case "Singleton": return {
-            name: child.name,
+            name: escape(child.name),
             toggled: true,
             children: child.members.filter(ast=> ast.type != "Constructor").map(this.convertMembers),
             type: "object",
             ast:child
           }
           case "Class": return {
-            name: child.name,
+            name: escape(child.name),
             toggled: true,
             children: child.members.filter(ast=> ast.type != "Constructor").map(this.convertMembers),
             type: "class",
@@ -91,7 +91,7 @@ class OutlineComponent extends Component {
           }
 
           case "Test": return {
-            name: child.name || child.description.value,
+            name: escape(child.name) || escape(child.description.value),
             toggled: true,
             children: child.sentences.sentences.map(this.convertMembers),
             type: "test",
@@ -99,7 +99,7 @@ class OutlineComponent extends Component {
           }
 
           case "Import": return {
-            name: child.target,
+            name: escape(child.target),
             toggled: true,
             type: "import",
             ast:child
@@ -116,12 +116,12 @@ class OutlineComponent extends Component {
   convertMembers = (ast) =>{
     switch(ast.type){
       case "Field": return {
-        name: "var " + ast.variable.name.token,
+        name: "var " + ast.variable.name.token.value,
         type: "variable",
         ast:ast
       }
       case "Method": return {
-        name: ast.name+"("+ ast.parameters.map(param=> this.parameterName(param)).join(",")+")",
+        name: escape(ast.name)+"("+ ast.parameters.map(param=> this.parameterName(param)).join(",")+")",
         type: "method",
         ast:ast
       }
@@ -131,13 +131,13 @@ class OutlineComponent extends Component {
         ast:ast
       }
       case "VariableDeclaration": return {
-        name: ast.variable.name.token,
+        name: ast.variable.name.token.value,
         type: "variable",
         ast:ast
       }
 
       case "Reference": return {
-        name: ast.name.type == "Link"? ast.name.token: ast.name ,
+        name: ast.name.type == "Link"? ast.name.token.value: escape(ast.name) ,
         type: "variable",
         ast:ast
       }
@@ -146,7 +146,7 @@ class OutlineComponent extends Component {
 
   parameterName(param){
     switch(param.type){
-      case "Reference": return param.name.type == "Link"? param.name.token : param.name 
+      case "Reference": return param.name.type == "Link"? param.name.token.value : param.name 
       case "Literal": return param.value 
       case "Send": return param.key+"("+ param.parameters.map(param=> this.parameterName(param)).join(",")+")"
     }

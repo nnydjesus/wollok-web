@@ -109,8 +109,8 @@ class IDEComponent extends Component {
         let file = aFile || this.state.file
         file.dirty = false
         file.parse()
-
-        sessionStorage.setItem("project", JSON.stringify(this.state.project))
+        
+        // sessionStorage.setItem("project", JSON.stringify(this.state.project))
         
         this.setState({file})
         // var jsCode = compiler(ast)
@@ -167,8 +167,8 @@ class IDEComponent extends Component {
 
     newFile =(file) =>{
         var project = this.state.project
-        project.children.push(file)
-        sessionStorage.setItem("project", JSON.stringify(this.state.project))
+        project.children.push(new File(file))
+        // sessionStorage.setItem("project", JSON.stringify(this.state.project))
         this.setState(project)
     }
 

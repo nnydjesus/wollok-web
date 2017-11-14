@@ -10,6 +10,7 @@ const PARAMETER_NAME_MUST_START_LOWERCASE = "El parámetro {name} debe empezar c
 const VARIABLE_NAME_MUST_START_LOWERCASE = "La variable {name} debe empezar con minúscula"
 const OBJECT_NAME_MUST_START_LOWERCASE = "El objeto {name} debe empezar con minúscula"
 const METHOD_DOESNT_EXIST = "El objeto {target} no tiene el método {name}"
+const DUPLICATED_CONSTRUCTOR = "Constructor duplicado"
 
 
 function isUpperCase(myString) { 
@@ -68,7 +69,7 @@ const validateWithNatives = (natives = {}) => {
 
     [Singleton]: ({ name, superclass: superclassName, mixins, superArguments, members, location}) => {
         var result = []
-        if(!isLowerCase(name[0])){
+        if(!isLowerCase(escape(name)[0])){
             result.push({location, message:OBJECT_NAME_MUST_START_LOWERCASE.format({name:name}), expected:[]})
         }
         return result.concat(_.flatten(members.map(validate)))
@@ -78,9 +79,17 @@ const validateWithNatives = (natives = {}) => {
 
     [Class]: ({ name, superclass: superclassName, mixins, members, location}) => {
         var result = []
-        if(!isUpperCase(name[0])){
+        if(!isUpperCase(escape(name)[0])){
             result.push({location, message:CLASS_NAME_MUST_START_UPPERCASE.format({name:name}), expected:[]})
         }
+
+        var constructors = members.filter(member => member.type == Constructor.name)
+        var constructorsWithSameParameters = constructors.filter(c1 => constructors.find(c2 => c1 != c2 &&  c2.parameters.length == c1.parameters.length))
+
+        constructorsWithSameParameters.forEach(constructor=>{
+            result.push({location:constructor.location, message:DUPLICATED_CONSTRUCTOR.format(), expected:[]})
+        })
+
         return result.concat(_.flatten(members.map(validate)))
     },
 
@@ -114,8 +123,8 @@ const validateWithNatives = (natives = {}) => {
 
     [Reference]: ({ name, location}) =>{
         if(name.type == Link.name){
-            if(!isLowerCase(name.token[0])){
-                return [{location, message:VARIABLE_NAME_MUST_START_LOWERCASE.format({name:name.token}), expected:[]}]
+            if(!isLowerCase(name.token.value[0])){
+                return [{location, message:VARIABLE_NAME_MUST_START_LOWERCASE.format({name:name.token.value}), expected:[]}]
             }  
         }  
         return []
@@ -178,7 +187,7 @@ const validateWithNatives = (natives = {}) => {
     },
 
     [Parameter]: ({ name, varArg, location }) => {
-        if(!isLowerCase(name[0])){
+        if(!isLowerCase(escape(name)[0])){
             return [{location, message:PARAMETER_NAME_MUST_START_LOWERCASE.format({name:name}), expected:[]}]
         }
         return []

@@ -13,6 +13,7 @@ export class File{
             this.ast = runner.parse(this.text)
             this.errors = runner.validate(this.ast)
         }catch(e){
+            console.log(e)
             this.ast = undefined
             this.errors = [validator.addContextInfo(e)]
         }

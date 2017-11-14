@@ -55,12 +55,37 @@
     }
 }
 
+.seecoderun_tooltip {
+	background-color: #FFF;
+	background-image: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.1));
+	background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1));
+	border: 1px solid gray;
+	border-radius: 1px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	color: black;
+	max-width: 100%;
+	padding: 3px 4px;
+	position: absolute;
+	z-index: 999999;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	cursor: default;
+	white-space: pre;
+	word-wrap: break-word;
+	line-height: normal;
+	font-style: normal;
+	font-weight: normal;
+	letter-spacing: normal;
+	pointer-events: none;
+}
+
 
 #wollok-content{
     height: 100vh;
 
     .pane{
-        border: 0.1px solid;
+        // border: 0.1px solid;
     }
     
     .ide-container{
@@ -78,6 +103,7 @@
             top: 0px;
             height: $header_height;
             width: 100%;
+            z-index: 100;
             background-color: $header_color;
 
             .toolbar{
@@ -130,6 +156,11 @@
             height: calc(100% - 35px) !important;
             height: -webkit-calc(100% - 35px) !important;
             height: -moz-calc(100% - 35px) !important;
+
+            .ace_link_marker {
+                position: absolute;
+                border-bottom: 1px solid blue;
+              }
         }
 
         .tabs{

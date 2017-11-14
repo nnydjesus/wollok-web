@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors",
     "build-dev": "./node_modules/webpack/bin/webpack.js",
-    "build-prod": "NODE_ENV=production ./node_modules/webpack/bin/webpack.js -p --progress --colors",
+    "build-prod": "NODE_ENV=production ./node_modules/webpack/bin/webpack.js --progress --colors",
     "prod": "NODE_ENV=production node index.js",
     "build-ssr": "NODE_ENV=production SSR_MODE=true ./node_modules/webpack/bin/webpack.js --progress --colors",
     "ssr": "NODE_ENV=production SSR_MODE=true node dist/server.js",
