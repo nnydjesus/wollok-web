@@ -1,11 +1,17 @@
 import React, {Component, PropTypes} from 'react';
-import AceEditor from 'react-ace'
-import WollokMode from './editor/wollok.js'
 import EditorHandler from './editor/eventHandler.js'
 import {File} from './model'
-import 'brace/theme/twilight'
-import 'brace/ext/language_tools';
-import 'brace/ext/searchbox';
+
+var AceEditor = {}
+var WollokMode = {}
+if (typeof window !== 'undefined') {
+    WollokMode = require('./editor/wollok.js').default
+    require('brace/theme/twilight')
+    require('brace/ext/language_tools');
+    require('brace/ext/searchbox');
+
+     AceEditor = require('react-ace').default
+}
 
 class EditorComponent extends Component {
 

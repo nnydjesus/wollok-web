@@ -1,11 +1,19 @@
-import ace from 'brace'
 import astFinder from '../model/astFinder.js'
 import astDescription from '../model/astDescription.js'
 
-const event = ace.acequire("ace/lib/event");
-const Range = ace.acequire("ace/range").Range;
-const EventEmitter = ace.acequire("ace/lib/event_emitter").EventEmitter;
-const oop =  ace.acequire("ace/lib/oop");
+var ace = undefined
+var event = undefined
+var Range = undefined
+var EventEmitter = undefined
+var oop = undefined
+
+if (typeof window !== 'undefined') {
+    ace =  require('brace')
+    event = ace.acequire("ace/lib/event");
+    Range = ace.acequire("ace/range").Range;
+    EventEmitter = ace.acequire("ace/lib/event_emitter").EventEmitter;
+    oop =  ace.acequire("ace/lib/oop");
+}
 
 
 export default class EditorHandler {

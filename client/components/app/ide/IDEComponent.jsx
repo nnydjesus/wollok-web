@@ -26,41 +26,7 @@ import theme from '../../../../resources/theme.jsx';
 import Splitter from 'm-react-splitters';
 import 'm-react-splitters/lib/splitters.css';
 
-
-
-const defaultProject = {
-    name: 'ejemplo',
-    toggled: true,
-    extension:"directory",
-    children: [
-        { name: 'aves.wlk', dirty:true, text:`object contador {
-var valor = 0
-
-method inc() { 
-valor +=  1  
-}
-
-}
-`,                   extension:"wlk"},
-        { name: 'aves.wtest', dirty:false,  text:`object pepita  {
-var energia = 100 * (44 / 232)
-var nombre = "Pepa"
-
-method comer(gramos) {
-energia += 4
-}
-
-method volar(km) {
-energia -= (10 + km)
-}
-
-method energia() { return energia }
-
-method estaFeliz() { return self.energia().between(50,1000) }
-}   
-`,               extension:"wtest"},
-    ]
-}
+import defaultProject  from './editor/defaultProject.jsx';
 
 const ErrorModel = {
     descriptrion: {type: String},
@@ -78,7 +44,7 @@ class IDEComponent extends Component {
         this.state = {
             openFiles:[],
             editorTabIndex: 0,
-            project: new Project(JSON.parse(sessionStorage.getItem("project") || JSON.stringify(defaultProject))),
+            project: new Project(defaultProject),
             bottomTabIndex:0,
             runningConsole:false
         };

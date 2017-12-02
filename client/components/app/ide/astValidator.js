@@ -108,7 +108,7 @@ const validateWithNatives = (natives = {}) => {
     },
 
     [Assignment]: ({ variable, value, location }) => {
-        if(variable.name == "this") { return [{location, message:CANNOT_ASSIGN_TO_ITSELF, expected:[]}] }
+        if(variable.name == "self") { return [{location, message:CANNOT_ASSIGN_TO_ITSELF, expected:[]}] }
 
         if (variable.name.type == Link.name){
             const { token, path } = variable.name
