@@ -1,0 +1,3 @@
+program sdf {
+ 	 console.println('Hello Wollok') 
+}

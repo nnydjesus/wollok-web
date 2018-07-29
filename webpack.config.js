@@ -1,5 +1,7 @@
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var CompressionPlugin = require('compression-webpack-plugin');
+// var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Disabled for Production build - enable it locally for inspecting Webpack bundle size
 var path = require('path');
 
 var devMode = process.env.NODE_ENV !== 'production';
@@ -99,32 +101,55 @@ var config = {
         test: /\.s?css$/,
         // TODO Change "loader" below to "use" in final version 2 of Extract Text Webpack Plugin
         loader: ssrMode ? "null-loader" : ExtractTextPlugin.extract({ fallbackLoader: "style-loader", loader: devMode ? devModeScssLoaders : prodModeScssLoaders }),
-        exclude: /(node_modules)\/react-toolbox/
+        /*exclude: /(node_modules)\/react-toolbox/*/
       },
-      {
+      /*{
         test: /\.css$/,
         // TODO Change "loader" below to "use" in final version 2 of Extract Text Webpack Plugin
         loader: ssrMode ? "null-loader" : ExtractTextPlugin.extract({ fallbackLoader: "style-loader", loader: devMode ? devModeRTCssLoaders : prodModeRTCssLoaders }),
         include: /(node_modules)\/react-toolbox/
-      },
+      },*/
       { test: /\.png$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/png" } },
-      { test: /\.jpe?g$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/jpeg" } },
       { test: /\.gif$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/gif" } },
-      { test: /\.txt$/, use: 'raw-loader' }
+      { test: /\.txt$/, use: 'raw-loader' },
+      { test: /\.jpe?g$/, loader: "url-loader", options: { "limit": 10000, "mimetype": "image/jpeg" } }
     ]
   },
   node: {
     fs: 'empty',
       // tls: 'empty'
   },
-  plugins: ssrMode ? [] : [
+  plugins: [
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+  ].concat(ssrMode ? [
+    new webpack.IgnorePlugin(/^pixi\.js$/),
+    new webpack.IgnorePlugin(/^ag-grid-enterprise$/),
+    new webpack.IgnorePlugin(/^ag-grid-react$/)
+  ] : [
     new ExtractTextPlugin({ filename: "styles.css" })
-  ],
+  ]).concat(!devMode && !ssrMode ? [
+    // new BundleAnalyzerPlugin(), // Disabled for Production build - enable it locally for inspecting Webpack bundle size
+    new webpack.DefinePlugin({ // <-- key to reducing React's size
+      'process.env': {
+        'NODE_ENV': JSON.stringify('production')
+      }
+    }),
+    new webpack.optimize.UglifyJsPlugin(), // Minify everything
+    new webpack.optimize.AggressiveMergingPlugin(), // Merge chunks
+    new CompressionPlugin({ // Compress bundle.js and styles.css
+      asset: "[path].gz[query]",
+      algorithm: "gzip",
+      test: /\.js$|\.css$/,
+      threshold: 10240,
+      minRatio: 0.8
+    })
+  ] : []),
   externals: {
     'cheerio': 'window',
     'react/lib/ExecutionEnvironment': true,
     'react/lib/ReactContext': true,
-  }
+  },
+
 };
 
 if (devMode) {

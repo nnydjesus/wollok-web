@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from 'react-dom';
+import { hydrate, render } from 'react-dom';
 import { reactApp } from './reactApp';
 
-render(reactApp(), document.getElementById('contentRoot'));
+((typeof process !== "undefined" && process.env && process.env.SSR_MODE === 'true') ? hydrate : render)(reactApp(), document.getElementById('contentRoot'));

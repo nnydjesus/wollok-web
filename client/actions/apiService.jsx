@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import FormData from 'form-data';
 
-export const API_HOST = (typeof window !== "undefined" && window.__CONFIG__ ? window.__CONFIG__.apiHost : global.__CONFIG__.apiHost);
+export const API_HOST = "http://localhost:3000"
 
 function toQueryParams(params) {
     return Object.keys(params)
@@ -14,8 +14,7 @@ export function apiFetch(getState, endpoint, { isBlob = false, isText = false, m
     return fetch(`${API_HOST}/${endpoint}` + queryParams, {
         headers: {
             'content-type': 'application/json',
-            'Authorization': getState().login.authToken,
-            'X-Client-Hostname': getState().siteConfig.shopUrl,
+            'X-API-Version': '2',
             ... headers
         },
         method,
@@ -40,10 +39,7 @@ export function apiFetch(getState, endpoint, { isBlob = false, isText = false, m
                 throw { id: "notFound" };
             } else if (response.status === 401 || response.status === 302) {
                 throw { id: "authError" };
-            } else if (response.status === 400) {
-                return response.json();
             }
-            
             throw { id: "defaultError" };
         });
 }
@@ -64,34 +60,14 @@ export function apiDelete(getState, endpoint, { params, body, headers } = {}) {
     return apiFetch(getState, endpoint, { method: 'DELETE', params, headers })
 }
 
+export function apiGetAsText(getState, endpoint, { params, headers } = {}) {
+    return apiFetch(getState, endpoint, { isText: true,  params, headers })
+}
+
 export function apiPostAsText(getState, endpoint, { params, body, headers } = {}) {
     return apiFetch(getState, endpoint, { isText: true, method: 'POST', body, params, headers })
 }
 
 export function apiPut(getState, endpoint, { params, body, headers } = {}) {
     return apiFetch(getState, endpoint, { method: 'PUT', body, params, headers })
-}
-
-export function apiUpload(getState, file) {
-    return new Promise((resolve, reject) => {
-        let data = new FormData();
-        data.append('file', file);
-        let request = new XMLHttpRequest();
-        request.open('post', `${API_HOST}/api/uploadFile?data=%7B%7D`, true);
-        request.setRequestHeader('Authorization', getState().login.authToken);
-        request.send(data);
-        request.addEventListener("loadend", () => {
-            if (request.status === 200) {
-                resolve(JSON.parse(request.responseText));
-            } else if (request.status === 403) {
-                reject({ id: "forbidden" });
-            } else if (request.status === 404) {
-                reject({ id: "notFound" });
-            } else if (request.status === 401 || response.status === 302) {
-                reject({ id: "authError" });
-            } else {
-                reject({ id: "defaultError" })
-            }
-        });
-    });
 }

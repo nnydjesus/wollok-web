@@ -1,22 +1,40 @@
 <!doctype html>
 <html>
+
 <head>
-    <title><%- pageTitle %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>
+        <%- pageTitle %>
+    </title>
     <link href="<%- pageIcon %>" rel="shortcut icon" type="image/png" />
     <link href="/dist/styles.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Dosis:300,400,600" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/public/icons.css">    
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdLWOMwRvUx-FsnEfexu4vgmvdefHzlVg&libraries=places" async defer></script>
 </head>
+
 <body>
-<div id="contentRoot"><% if (typeof markup != 'undefined') { markup } %></div>
-<script type="text/javascript">
-    <%# WARNING: See the following for Security isues with this approach:
+    <div id="contentRoot">
+        <% if (typeof markup != 'undefined') { markup } %>
+    </div>
+    <script type="text/javascript">
+        <%# WARNING: See the following for Security isues with this approach:
     http://redux.js.org/docs/recipes/ServerRendering.html#security-considerations %>
-    <% if (typeof preloadedState !== 'undefined') { %>window.__PRELOADED_STATE__ = <%- preloadedState %>;<% } %>
-    <% if (typeof siteConfig !== 'undefined') { %>window.__CONFIG__ = <%- siteConfig %>;<% } %>
-</script>
-<script src="/dist/bundle.js" type="text/javascript"></script>
-<% if (typeof environmentVariables !== 'undefined') { %><!-- <%- environmentVariables %>--><% } %>
+        <% if (typeof preloadedState !== 'undefined') { %>
+        window.__PRELOADED_STATE__ = <%- preloadedState %>;
+        <% } %>
+        <% if (typeof siteConfig !== 'undefined') { %>
+        window.__CONFIG__ = <%- siteConfig %>;
+        <% } %>
+    </script>
+    <script src="/dist/bundle.js" type="text/javascript"></script>
+    <% if (typeof environmentVariables !== 'undefined') { %>
+        <!-- <%- environmentVariables %>-->
+        <% } %>
 </body>
+
 </html>

@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "name": "Lollapalooza 2019",
+  "venue": {
+    "id": "1",
+    "name": "Hipódromo de San Isidro"
+  },
+  "client": {
+    "id": "1",
+    "name": "DF Entertainment"
+  },
+  "thumbImage": "https://cdn.boletius.com/images/1530709537453-PORTADA-ALLACCESS-TICKETS-A-LA-VENTA.png"
+}

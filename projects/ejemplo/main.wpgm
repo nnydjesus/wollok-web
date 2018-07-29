@@ -1,0 +1,7 @@
+
+
+program Ejemplo {
+  var variable = 'Hello Wollok'
+ 	 console.println(variable) 
+}
+

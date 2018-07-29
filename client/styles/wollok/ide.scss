@@ -55,6 +55,11 @@
     }
 }
 
+.contextMenuIcon{
+    margin-right: 10px; 
+    text-align: center;
+}
+
 .seecoderun_tooltip {
 	background-color: #FFF;
 	background-image: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.1));
@@ -81,7 +86,7 @@
 }
 
 
-#wollok-content{
+#contentRoot{
     height: 100vh;
 
     .pane{
@@ -107,10 +112,24 @@
             background-color: $header_color;
 
             .toolbar{
-                display: inline-flex;
                 width: 100%;
-                height: 100%;
-                padding-left: 20px;
+                height: 30px;
+
+                .ant-menu-horizontal{
+                    height: 30px;
+                    line-height: 25px;
+                    background-color: transparent;
+                    .ant-menu-submenu-horizontal{
+                        .ant-menu-submenu-title{
+                            padding: 0 10px;
+                            color: white;
+                        }
+                    }
+                    .ant-menu-item{
+                        padding: 0 10px;
+                        color: white;
+                    }
+                }
 
                 .material-icons{
                     color: $toolbar_icon_color;
@@ -147,15 +166,40 @@
             height: -moz-calc(100vh - $header_height )!important;
         }
 
+        .ant-tabs{
+            height: 100%;
+            .ant-tabs-bar{
+                border-bottom: none;
+                margin: 0 0 0px 0;
+                color: white;
+            }
+            .ant-tabs-ink-bar{
+                display: none!important;
+            }
+
+            .ant-tabs-tab-active {
+                background: #141414;
+                border-style: solid;
+                border-width: 1px 1px 0px 1px;
+                border-color: gray;
+                border-radius: 10px 10px 0px 0px;
+                cursor: default;
+            }
+
+            .ant-tabs-content{
+                height: 100%;
+                .ant-tabs-tabpane{
+                    height: 100%;
+                }
+            }
+        }
+        
         .ace_editor {
             border-style: none !important;
             border-radius: 3px;
             border-collapse: collapse;
             width: 100%!important;
-            height: 100vh;
-            height: calc(100% - 35px) !important;
-            height: -webkit-calc(100% - 35px) !important;
-            height: -moz-calc(100% - 35px) !important;
+            height: 100%;
 
             .ace_link_marker {
                 position: absolute;
@@ -297,13 +341,11 @@
                     .search{
                         color: white;
                         padding: 0px;
-                        margin-left: 35px;
                         margin-bottom: 10px;
                     }
 
 
                     input{
-                        color: white;
                         font-size: 20px;
                     }
 

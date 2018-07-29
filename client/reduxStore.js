@@ -1,31 +1,36 @@
 import React from 'react';
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import { loadTranslations, setLocale, syncTranslationWithStore, i18nReducer } from 'react-redux-i18n';
-import loginReducer from './reducers/login.jsx';
-import forgotPasswordReducer from './reducers/forgotPassword.jsx';
-import translations from '../resources/translation.json';
+import fsReducer from './reducers/fileSystem.jsx';
+import { loadTranslations, setLocale, syncTranslationWithStore, i18nReducer, I18n } from 'react-redux-i18n';
 
 export const reduxStore = (initialState) => {
-    const defaultSiteConfig = Object.assign({}, initialState.siteConfig);
+    const defaultSiteConfig = {...initialState.siteConfig };
     const siteConfigReducer = (state = defaultSiteConfig, action) => {
         switch (action.type) {
-            default:
-                return state;
+            default: return state;
         }
     };
-    let store = createStore(combineReducers(
-        {
-            siteConfig: siteConfigReducer,
-            login: loginReducer,
-            forgotPassword: forgotPasswordReducer,
-            i18n: i18nReducer
-        }
-    ), initialState, applyMiddleware(thunk));
+
+    const translations = {
+        
+    };
+
+    let store = createStore(combineReducers({
+        siteConfig: siteConfigReducer,
+        fs: fsReducer
+        
+    }), initialState, applyMiddleware(thunk));
 
     syncTranslationWithStore(store);
-    store.dispatch(loadTranslations(translations));
-    store.dispatch(setLocale(initialState.i18n.locale || 'en'));
+    const splitCamelCaseMissingTranslation = (key, replacements) => key.split('.').pop()
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/[A-Z]/g, str => str.toLowerCase())
+        .replace(/_/g, ' ')
+        .replace(/\b./g, str => str.toUpperCase());
+    I18n.setHandleMissingTranslation(splitCamelCaseMissingTranslation);
+    // store.dispatch(loadTranslations(translations));
+    // store.dispatch(setLocale(initialState.i18n.locale || 'en'));
 
     return store;
 };

@@ -1,13 +1,13 @@
 #README
 
-Wollok-Web is using some of the latest web technologies: React, Webpack, Express, Babel, Sass, and others.
+dashboard-react is using some of the latest web technologies: React, Webpack, Express, Babel, Sass, and others.
 
 ## How do I get set up? ##
 
 ###Run the app
 `npm start`
 
-Starts an Express web server pointing to public/index.html in port 9990. Starts Webpack in watch mode as an Express middleware, serving bundled content from <host>:9990/dist.
+Starts an Express web server pointing to public/index.html in port 3000. Starts Webpack in watch mode as an Express middleware, serving bundled content from <host>:3000/dist.
 
 ###Run Webpack in dev mode
 `npm run dev`
