@@ -11,7 +11,7 @@ import Problems from './Problems.jsx'
 import Splitter from 'm-react-splitters';
 import 'm-react-splitters/lib/splitters.css';
 import {
-    createFolder, updateFile, loadProject, createProject
+    createFolder, updateFile, loadProject, createProject, deleteFile
 } from '../../actions/fileSystem.jsx';
 
 
@@ -96,14 +96,15 @@ class IDEComponent extends Component {
 
     handleSelectFile = (file) =>{
         let index = this.state.openFiles.findIndex( f=> f.name == file.name)
+        file.parse()
         if(index<0){
             let files = this.state.openFiles
             files.push(file)
             this.setState({openFiles:files, file,  editorTabIndex:file.name});
-            this.onSaveFile(file)
+            // this.onSaveFile(file)
         }else{
             this.setState({file,  editorTabIndex:file.name})
-            this.onSaveFile()
+            // this.onSaveFile()
         }
     }
 
@@ -126,8 +127,9 @@ class IDEComponent extends Component {
     }
 
     newFile =(fileProperties) =>{
-        var currentNode = this.refs.fileBrowser.state.cursor
+        var currentNode = this.refs.fileBrowser.selectedNode
         var project = this.props.project
+        fileProperties.isNew = true
         var file = new File(fileProperties)
         project.addFileToElement(file, currentNode)
         // sessionStorage.setItem("project", JSON.stringify(this.props.project))
@@ -137,7 +139,7 @@ class IDEComponent extends Component {
 
     
     newFolder =(folderName) =>{
-        var currentNode = this.refs.fileBrowser.state.cursor
+        var currentNode = this.refs.fileBrowser.selectedNode
         var project = this.props.project
         var folder = new Folder({name:folderName})
         project.addFolderToElement(folder, currentNode)
@@ -145,10 +147,20 @@ class IDEComponent extends Component {
         this.props.dispatch(createFolder(folder))
     }
 
+    deleteElement = (element) =>{
+        if(!element.isDirectory){
+            this.props.dispatch(deleteFile(element))
+        }
+    }
+
     runCommand = (command) =>{
         if(this.currentEditor){
             this.currentEditor.runCommand(command)
         }
+    }
+
+    rename = (element) =>{
+
     }
 
     render() {
@@ -167,7 +179,7 @@ class IDEComponent extends Component {
                     <Splitter position="horizontal"  primaryPaneMaxHeight="90%" primaryPaneHeight="80%" className="left-panel">
                         <div className='left-panel-top'>
                             <div className='file-browser'>
-                                <FileBrowser ref="fileBrowser" project={this.props.project} selectFile={this.handleSelectFile}/>
+                                <FileBrowser ref="fileBrowser" project={this.props.project} selectFile={this.handleSelectFile} rename={this.rename} deleteElement={this.deleteElement}/>
                             </div>
                         </div>
                         <div >

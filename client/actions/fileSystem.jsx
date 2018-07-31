@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from './apiService.jsx';
+import { apiGet, apiPost, apiDelete } from './apiService.jsx';
 
 export const createFolder = (folder) => {
     return (dispatch, getState) => {
@@ -8,7 +8,7 @@ export const createFolder = (folder) => {
                 path:folder.path
             }
         }).then(json => {
-            console.log(json)
+            dispatch({ type: 'CREATE_FOLDER_SUCCESSFUL' });
         }).catch(error => {
             console.log(error)
         })
@@ -25,7 +25,9 @@ export const updateFile = (file) => {
                 text: file.text
             }
         }).then(json => {
-            console.log(json)
+            if(file.isNew){
+                dispatch({ type: 'CREATE_FILE_SUCCESSFUL', file:file});
+            }
         }).catch(error => {
             console.log(error)
         })
@@ -60,6 +62,20 @@ export const createProject = (projectName) => {
             }
         }).then(json => {
             dispatch({ type: 'LOAD_PROJECT_SUCCESSFUL', project: json });
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+}
+
+export const deleteFile = (file) => {
+    return (dispatch, getState) => {
+        apiDelete(getState, 'api/files/'+file.name, {
+            body: {
+                path:file.path
+            }
+        }).then(json => {
+            dispatch({ type: 'DELETE_FILE_SUCCESSFUL', file: file });
         }).catch(error => {
             console.log(error)
         })

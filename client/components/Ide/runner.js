@@ -18,6 +18,7 @@ class Runner{
     }
 
     eval(code){
+        console.log(code)
         return eval(scope+"; "+ code);
     }
 

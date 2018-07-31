@@ -48,6 +48,14 @@
   border-color: transparent;
 }
 
+.react-contexify{
+    z-index: 100;
+    .wollok-object{
+        margin: auto 0;
+        margin-right: 10px;
+    }
+}
+
 .fullHeight{
     height: 100%;
     section{

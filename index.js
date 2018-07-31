@@ -66,7 +66,7 @@ app.post('/api/folers', bodyParser.json(), function(req, res) {
 
 app.post('/api/files', bodyParser.json(), function(req, res) {
     var file = req.body;
-    fs.writeFile("./projects/"+file.path+"/"+file.name+"."+file.extension, file.text, function(e){
+    fs.writeFile("./projects/"+file.path+"/"+file.name, file.text, function(e){
         console.log(e)
     })
     res.status(200);
@@ -83,7 +83,7 @@ function readFolderContent(folder){
         if(file.indexOf(".")>0){
             var split = file.split(".")
             var content = fs.readFileSync("./projects"+folderPath+"/"+file, 'utf8').toString()
-            folder.children.push({name:split[0], extension:split[1], path: folderPath, text:content, dirty:false})
+            folder.children.push({name:file, extension:split[1], path: folderPath, text:content, dirty:false})
         }else{
             var newFolder = {name:file, extension:"directory", children:[], path:folderPath+"/"}
             folder.children.push(newFolder)
@@ -124,6 +124,16 @@ app.post('/api/projects', bodyParser.json(), function(req, res) {
     res.status(200);
     res.type("application/json");
     res.write(JSON.stringify(project));
+    res.end();
+});
+
+app.delete('/api/files/:fileName', bodyParser.json(), function(req, res) {
+    var filePath = req.body.path;
+    var fileName = req.params.fileName;
+    fs.unlinkSync("./projects"+filePath+"/"+fileName)
+    res.status(200);
+    res.type("application/json");
+    res.write("{}");
     res.end();
 });
 

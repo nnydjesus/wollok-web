@@ -60,25 +60,30 @@ export class Folder {
     }
 
     addFile(file){
-        var parent = this
-        var parentPath = parent.path+parent.name
-        parentPath.replace(file.path, "").split("/").forEach(name =>{
-            if(name != undefined && name != "" && name != parent.name){
-                parent = parent.children.find(c => c.name == name)
-            }
-        })
-        parent.children.push(file);
+        var folder = this.findFolderByPath(file.path)
+        folder.children.push(file);
     }
 
     addFolder(folder){
-        var parent = this
-        folder.path.split("/").forEach(name =>{
-            if(name != undefined && name != "" && name != parent.name){
-                parent = parent.children.find(c => c.name == name)
-            }
-        })
+        var parent = this.findFolderByPath(folder.path)
         parent.children.push(folder);
     }
+
+    findFolderByPath = (folderPath) => {
+        var element = this
+        if(element.path == folderPath || (element.path+"/"+element.name) == folderPath){
+          return element
+        }
+    
+        var subPath = folderPath.replace(element.path+element.name, '')
+        subPath.split("/").forEach(p =>{
+          if(p != ""){
+            element = element.children.find( child => child.name == p && child.isDirectory)
+          }
+        })
+        return element
+      }
+
 
 }
 

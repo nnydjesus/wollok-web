@@ -57,7 +57,7 @@ export function apiPost(getState, endpoint, { params, body, headers } = {}) {
 }
 
 export function apiDelete(getState, endpoint, { params, body, headers } = {}) {
-    return apiFetch(getState, endpoint, { method: 'DELETE', params, headers })
+    return apiFetch(getState, endpoint, { method: 'DELETE', body, params, headers })
 }
 
 export function apiGetAsText(getState, endpoint, { params, headers } = {}) {
