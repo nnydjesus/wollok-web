@@ -19,7 +19,7 @@ export const handleRender = (req, res) => {
         } else if (props) {
             // if we got props, that means we found a valid component to render
             // for the given route
-            const siteConfig = req.config.siteConfig;
+            const siteConfig = {};
             props.params.siteConfig = siteConfig;
             const html = renderToString(<Provider store={store}><RouterContext {...props} /></Provider>);
 
