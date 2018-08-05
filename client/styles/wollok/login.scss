@@ -1,20 +1,315 @@
-.login-container{
-  width: 100%;
-  height: 100vh;
-  background-color: lightgrey;
-  color: #fff;
-  font: normal 13px 'Ubuntu', sans-serif;
-  overflow: hidden;
 
-  .login-panel{
-    position: fixed;
-    width: 350px;
-    top: 30%;
-    left: 50%;
-    margin-left: -175px;
-    padding: 35px;
+	@mixin app-icon($color1,$color2){
+    border-radius: 44px;width: 140px; height: 140px; display: flex;margin:20px 20px 30px 20px;align-items: center; justify-content: center; transition: all 0.2s ease-in-out;
+    background:linear-gradient(to bottom left, $color1, $color2); box-shadow: 0px 5px 10px  rgba(101, 126, 138, 0), inset 0 0 0 rgba(0,0,0,0);
+ }
 
-    input{
+
+.login_modal{
+  background: none;
+  box-shadow: none;
+  .login_modal_close{
+    display: none;
+  }
+ }
+
+
+.launcher {
+
+  background: $background_color;
+
+//@include app-components($launcher_app_color, $launcher_second_color);
+ 
+.launcher { padding: 0px !important;}
+.launcher header { padding: 0px !important;}
+
+.dropdown-item.active, .dropdown-item:active {color: #fff !important ;text-decoration: none;background: $launcher_app_color;}
+
+.page-menu ul li.active a { border-right: solid 3px $launcher_app_color}
+.form-group input.form-control:focus { border-bottom: solid 1px $launcher_app_color}
+
+ 
+.icons-container  {flex-wrap: wrap;align-self: center; display: flex;width: 100%; max-width: 1080px;}
+.app-icon .icon { border: solid 1px rgba(255,255,255,0.15); width: 120px; height: 120px; border-radius: 99px;align-items: center; justify-content: center; display: flex;}
+.app-icon .icon img , .app-icon .icon svg { width: 90%;}
+.launcher-icon { margin-bottom: 10px;}
+.launcher-icon label { width: 100%;text-align: center;text-transform: uppercase;color: #3b4f63;font-size: 13px;position: relative; font-family: $brand_font !important; font-weight: 600; transition: all 0.2s ease-in-out;}
+.launcher-icon:hover .app-icon{  box-shadow: 0px 23px 40px  rgba(101, 126, 138, 0.35), inset 0 -2px 0 rgba(0,0,0,0.1); -webkit-transform: scale(1.2); transform: scale(1.2)}
+
+.launcher-icon label {position: absolute;width: 100%;text-align: center;text-transform: uppercase;color: #3b4f63;font-size: 13px;position: relative;font-family:$brand_font!important; font-weight: 600; transition: all 0.2s ease-in-out; float: left; margin: -20px 0 0 0; opacity: 1; padding: 0 0 20px 0;}
+.launcher-icon:hover label { opacity: 0.7; padding: 10px 0 0 0;}
+
+.bg-login { width: 500px; padding: 100px 0 50px 0;}	
+.login-container { 
+  width: 96%; max-width: 430px; margin: 0 auto;
+    .form-group {
+      margin-bottom: 0px;
     }
+}
+.login-container .brand { margin-bottom: 40px; text-align: center;}
+.login-container .brand img , .login-container .brand svg { max-height: 50px;}
+.login-container .box { background: #fff; border-radius: 2px;padding: 25px;box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 25px;}
+.login-container .box input.form-control { margin-bottom: 15px;}
+.login-container .box input.form-control:focus { border: solid 1px $launcher_app_color}
+.login-container .box hr { margin: 20px -25px; opacity: 0.5;}
+.login-container .box a.recover { font-size: 12px; color: #888;}
+.login-container .box a.recover:hover { color: #222; text-decoration: underline !important;}
+.login-container .btn { background:$launcher_app_color; color: #fff !important; font-size: 20px; border-radius: 2px; line-height: 42px; padding: 2px 0; height: 48px;}
+.login-container .btn-facebook { background: #316a9b}
+
+.login-container .box .error {background:#fffaee; text-align: center; font-size: 12px; padding: 15px; margin-bottom: 25px; color: #7c7668}	
+.login-container .box h4 { display: block; font-size: 15px; margin-bottom: 25px;}
+.login-container .user { display: block; margin-bottom:10px; padding-bottom: 10px; border-bottom: solid 1px #fafafa; }
+.login-container .user div.avatar { display: block; width: 70px; height: 70px; position: relative; float: left; border-radius: 90px; border: solid 2px #fff; transition: 0.2s ease-in-out;}
+.login-container .user div.user-info { position: relative; float: left; padding: 15px 0 0 95px}
+.login-container .user div.user-info h2 { font-size: 16px;padding: 0px;margin: 0; color: #222; transition: 0.2s ease-in-out;}
+.login-container .user div.user-info span { font-size: 12px; color: #999}
+ 
+.login-container .user:last-child  { margin-bottom:0; padding-bottom:0; border-bottom:none !important ; }
+ .login-container .user:hover {	
+ div.avatar { border: solid 2px $launcher_app_color;}
+   div.user-info h2 { color: $launcher_app_color;}
+}
+ 
+ 
+
+@media screen and (max-width:1366px) {
+ 
+header { padding: 0 10px;}
+ 
+
+
+.app-icon { width: 120px; height: 120px; margin: 15px;   border-radius: 36px;}	
+.app-icon .icon { width: 80%; height: 80%; align-items: center; justify-content: center; display: flex;}
+.app-icon .icon img , .app-icon .icon svg { width: 90%;}
+
+.launcher-icon label {font-size: 11px;position: relative; font-family: $brand_font !important; font-weight: 600; transition: all 0.2s ease-in-out;}
+.launcher-icon:hover .app-icon{  box-shadow: 0px 23px 40px  rgba(101, 126, 138, 0.35), inset 0 -2px 0 rgba(0,0,0,0.1); -webkit-transform: scale(1.1); transform: scale(1.1)}
+
+.launcher-icon label {position: absolute;width: 100%;text-align: center;text-transform: uppercase;color: #3b4f63;font-size: 11px;position: relative;font-family:$brand_font!important; font-weight: 600; transition: all 0.2s ease-in-out; float: left; margin: 0; opacity: 1; padding: 0;}
+.launcher-icon:hover label { opacity: 0.7; padding:0}
+ 
+.bg-login { padding: 40px 0 50px 0;}	
+ 
+}
+
+ 
+ 
+@media screen and (max-width:768px) {
+ 
+header { padding: 0 10px;}
+ 
+
+.desktop {  height: auto; display:block; padding: 100px 35px;}
+.icons-container  {flex-wrap:unset;align-self:auto; display:block;}
+.launcher-icon { width: 50%; position: relative; float: left; height: 130px;}
+.app-icon { width: 80px; height: 80px; margin: 0px auto 10px auto;   border-radius: 26px;}	
+.app-icon .icon { border: none; width: 100%; height: 100%; align-items: center; justify-content: center; display: flex;}
+.app-icon .icon img , .app-icon .icon svg { width: 90%;}
+
+.launcher-icon label {font-size: 11px;position: relative; font-family: $brand_font !important; font-weight: 600; transition: all 0.2s ease-in-out;}
+.launcher-icon:hover .app-icon{  box-shadow: 0px 23px 40px  rgba(101, 126, 138, 0.35), inset 0 -2px 0 rgba(0,0,0,0.1); -webkit-transform: scale(1); transform: scale(1)}
+
+.launcher-icon label {position: absolute;width: 100%;text-align: center;text-transform: uppercase;color: #3b4f63;font-size: 11px;position: relative;font-family:$brand_font!important; font-weight: 600; transition: all 0.2s ease-in-out; float: left; margin: 0; opacity: 1; padding: 0;}
+.launcher-icon:hover label { opacity: 0.7; padding:0}
+ 
+.bg-login { padding: 40px 0 50px 0;}	
+ 
+}
+
+
+}
+
+
+
+.log {
+  margin:0 auto;
+
+  .clear {
+    clear: both;
+  }
+
+  .content1 h2 {
+    font-size:40px;
+    padding: 30px 0 0;
+    color:#fff;
+    font-weight: 300;
+    font-family: 'Nunito', sans-serif;
+    text-align:center;
+  }
+  
+  .content2 h2 {
+    font-size:40px;
+    padding: 30px 0 0;
+    color:#fff;
+    font-weight: 300;
+    font-family: 'Nunito', sans-serif;
+    text-align:center;
+  }
+  .content1 {
+      text-align: center;
+      background-color:rgba(33, 54, 97, 0.59);
+      border-radius: 0px;
+  }
+  .content1 input[type="text"] {
+    padding:10px 10px 10px 10px;
+    width:76%;
+    border:1px solid #fff;
+    color:#fff;
+    text-align:left;
+    outline:none;
+    font-size:18px;
+    background:rgba(0, 0, 0, 0);
+    font-weight: 300;
+    font-family: 'Muli', sans-serif;
+  /*-- W3Layouts --*/
+  }
+  .content1 input[type="password"] {
+    padding:10px 10px 10px 10px;
+    width:76%;
+    border:1px solid #fff;
+    color:#fff;
+    text-align:left;
+    outline:none;
+    font-size:18px;
+    background:rgba(0, 0, 0, 0);
+    font-weight: 300;
+    font-family: 'Muli', sans-serif;
+  }
+  .button-row {
+    width:100%;
+    margin-top:5%;
+    padding-bottom:40px;
+  }
+  .sign-in {
+    padding:10px;
+    height: 50px;
+    background-color:#0a6ad0;
+    width:80%;
+    border:none;
+    cursor:pointer;
+    color:#fff;
+    font-weight: 300;
+    font-family: 'Nunito', sans-serif;
+    font-size:20px;
+    transition: all 0.5s ease-in-out;
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+  }
+  .sign-in:hover {
+    background-color:#1259a5;
+    color:#fff;
+  }
+  h3 {
+      background: rgba(34, 81, 125, 0.82);
+      padding: 0.8em 0;
+      font-size: 1.2em;
+      color: #fff;
+      text-align: center;
+      margin-top: 2em;
+  }
+  h3 a {
+      color: #f2575d;
+  }
+  h3 a:hover{
+      color: #fff;
+  }
+  /*-- AgileITS --*/
+  .social li {
+      display: inline-block;
+      width: 25%;
+      text-align: center;
+      float: left;
+    padding:0.5em 0;
+  }
+  li.f {
+      background: #3b5998;
+  }
+  li.t {
+      background: #55acee;
+  }
+  li.p {
+      background: #bd2026;
+  }
+  li.i {
+      background: #0076b4;
+  }
+
+  .form-group{
+    display: block;
+    margin-top: 4%;
+  }
+
+  .content2 {
+      text-align: center;
+      background-color: rgba(33, 54, 97, 0.59);
+      border-radius: 0px;
+  }
+  .content2 input[type="text"] {
+    padding:10px 10px 10px 10px;
+    width:76%;
+    border:1px solid white;
+    color:#fff; 
+    text-align:left;
+    outline:none;
+    font-size:18px;
+    background:rgba(0, 0, 0, 0);
+    font-weight: 300;
+    font-family: 'Muli', sans-serif;
+  }
+  .content2 input[type="tel"] {
+    padding:10px 10px 10px 10px;
+    width:76%;
+    border:1px solid white;
+    color:#fff; 
+    text-align:left;
+    outline:none;
+    font-size:18px;
+    background:rgba(0, 0, 0, 0);
+    font-weight: 300;
+    font-family: 'Muli', sans-serif;
+  }
+  .content2 input[type="email"],.content1 input[type="email"] {
+    padding:10px 10px 10px 10px;
+    width:76%;
+    border:1px solid white;
+    color:#fff; 
+    text-align:left;
+    outline:none;
+    font-size:18px;
+    background:rgba(0, 0, 0, 0);
+    font-family: 'Muli', sans-serif;
+  }
+  .content2 input[type="password"] {
+    padding:10px 10px 10px 10px;
+    width:76%;
+    border:1px solid white;
+    color:#fff;
+    text-align:left;
+    outline:none;
+    font-size:18px;
+    background:rgba(0, 0, 0, 0);
+    font-weight: 300;
+    font-family: 'Muli', sans-serif;
+  }
+  .register {
+    padding:10px;
+    background-color:#0a6ad0;
+    width:80%;
+    border:none;
+    cursor:pointer;
+    color:#fff;
+    font-weight: 300;
+    font-family: 'Nunito', sans-serif;
+    font-size:20px;
+    margin-top:7%;
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+  }
+  .register:hover {
+    background-color:#1259a5;
+    color:#fff;
   }
 }

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import EditorHandler from './editor/eventHandler.js'
-import {File} from './model'
+
 
 var AceEditor = {}
 var WollokMode = {}

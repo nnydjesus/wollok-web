@@ -1,28 +1,28 @@
-import React, {Component, PropTypes} from 'react';
+import React from 'react';
 import { Input } from 'antd';
 import { connect } from 'react-redux';
 import {Treebeard, decorators} from 'react-treebeard';
 import treebeardStyle from './treebeardStyle'
 import TrashIcon from 'react-icons/lib/fa/trash'
 import RefreshIcon from 'react-icons/lib/fa/refresh'
+import FileCreator from './FileCreator.jsx';
+import { Icon } from 'antd';
 import _ from 'lodash'
 import { ContextMenu, Item, Separator, Submenu, ContextMenuProvider } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.min.css';
+import {showLogin} from "../../actions/login.jsx";
 
 const Search = Input.Search;
 const defaultMatcher = (filterText, node) => {
   return node.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1;
 }
-const onClick = ({ event, ref, data, dataFromProvider }) => console.log('Hello');
 
-// Example: Customising The Header Decorator To Include Icons
-
-class FileBrowserComponent extends Component {
+class FileBrowserComponent extends FileCreator {
   constructor(props) {
     super(props);
 
     this.state = {
-      project: props.project
+      project: props.project?{...props.project}:undefined
     };
   }
 
@@ -35,27 +35,38 @@ class FileBrowserComponent extends Component {
               <ContextMenuProvider id={node.name}>
                 <div style={style.title}>
                     <i className={"icon-file file-"+node.extension} style={iconStyle}/>
-                    {node.editMode? <input autoFocus value={this.state.renameNode} type="text" className="newFileName" onChange={this.updateField("renameNode")} onKeyPress={this.handleRename(node)}/>  : node.name}
+                    {node.editMode? <input autoFocus value={node.rename} type="text" className="newFileName" onChange={this.updateName(node)} onKeyDown={this.handleRename(node)}/>  : node.name}
                 </div>
               </ContextMenuProvider>
               <ContextMenu id={node.name} theme="dark" animation='pop'>
-                {node.extension=="directory" &&
-                    <Submenu label="Nuevo archivo">
-                    <Item onClick={onClick}><i className="icon-file wollok-object" /> Objeto</Item>
-                    <Item onClick={onClick}><i className="icon-file wollok-class" /> Clase</Item>
-                    <Item onClick={onClick}><i className="icon-file wollok-test" /> Test</Item>
-                    <Item onClick={onClick}><i className="icon-file wollok-program" /> Programa</Item>
+
+                  <Submenu label="Nuevo archivo">
+                    <Item onClick={this.createObject}><i className="icon-file wollok-object" /> Objeto</Item>
+                    <Item onClick={this.createClass}><i className="icon-file wollok-class" /> Clase</Item>
+                    <Item onClick={this.createTest}><i className="icon-file wollok-test" /> Test</Item>
+                    <Item onClick={this.createProgram}><i className="icon-file wollok-program" /> Programa</Item>
                   </Submenu>
-                }
+
                  <Separator />
-                <Item onClick={()=> this.changeEditMode(node)}>
-                    <span className="contextMenuIcon"><RefreshIcon/></span>
-                    <span>Renombrar</span>
+                
+                 <Item onClick={()=> this.newFolder(node)}>
+                    <span className="contextMenuIcon"><Icon type="folder-add" /></span>
+                    <span>Nuevo directorio</span>
                 </Item>
-                <Item onClick={()=> this.deleteNode(node)}>
-                    <span className="contextMenuIcon"><TrashIcon/></span>
-                    <span>Eliminar</span>
-                </Item>
+
+                 {node.extension!="directory" &&
+                  <Item onClick={()=> this.changeEditMode(node)}>
+                      <span className="contextMenuIcon"><RefreshIcon/></span>
+                      <span>Renombrar</span>
+                  </Item>
+                 }
+                 
+
+                  <Item onClick={()=> this.deleteNode(node)}>
+                      <span className="contextMenuIcon"><TrashIcon/></span>
+                      <span>Eliminar</span>
+                  </Item>
+                
               </ContextMenu>
           </div>
       );
@@ -63,33 +74,40 @@ class FileBrowserComponent extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (!this.state.project || this.state.project.updates != newProps.project.updates) {
-      this.setState({project:newProps.project}); 
+    if (!newProps.project || !this.state.project || this.state.project.name != newProps.project.name || this.state.project.updates != newProps.project.updates) {
+      this.setState({project:newProps.project?{...newProps.project}:undefined}); 
     }
   }
 
   handleRename = (node) => (event) =>{
     if(event.key == 'Enter'){
-      var element = this.findElementByNode(node)
-      element.name = this.state.renameNode
-      element.editMode = false
+        var file = this.findElementByNode(node)
+        file.editMode = false
+        this.props.dispatch(this.props.fileSystem.renameFile(file, file.rename))
+    }else if(event.key == 'Escape'){
+      var file = this.findElementByNode(node)
+      file.editMode = false
       this.setState({project:this.state.project})
     }
   }
 
-  updateField = (field) => (event) => {
-    var newState = {}
-    newState[field] = event.target.value
-    this.setState(newState)
+  updateName = (node) => (event) => {
+    var element = this.findElementByNode(node)
+    element.rename = event.target.value
+    this.setState({project:this.state.project})
   }
 
   changeEditMode = (node) =>{
       var element = this.findElementByNode(node)
       element.editMode = true
-      this.setState({project:this.state.project, renameNode:node.name})
+      element.rename = node.name
+      this.setState({project:this.state.project})
   }
 
   deleteNode = (node) =>{
+    if(this.props.selectedNode.equals(node)){
+      this.props.dispatch(this.props.fileSystem.selecteFileNode(this.props.project))
+    }
     this.props.deleteElement(this.findElementByNode(node))
   }
 
@@ -116,9 +134,8 @@ class FileBrowserComponent extends Component {
     node.active = true;
     if(node.children){
        node.toggled = toggled; 
-    }else{
-      this.props.selectFile(node)
     }
+    this.props.dispatch(this.props.fileSystem.selecteFileNode(node))
     this.setState({ cursor: node });
     
   }
@@ -165,12 +182,17 @@ class FileBrowserComponent extends Component {
     this.setState({project: filtered});
   }
 
+  showLogin  = () => {
+    this.props.dispatch(showLogin())
+  }
+
 
   render() {
     return (
       <div  className="file-browser-tree">
         {this.state.project && 
         <div>
+          {!this.props.isLogged && <div> <button className="btn btn-block btn-warning login" onClick={this.showLogin}> Ingresar para guardar el proyecto </button> </div>}
           <Search placeholder='search' name='search' className="search"  onSearch={this.onFilterMouseUp } />
           <Treebeard
             data={this.state.project}
@@ -188,8 +210,11 @@ class FileBrowserComponent extends Component {
 
 const mapStateToProps = (globalState) => {
   return {
-
+      projectUpdates: globalState.fs.updates,
+      project: globalState.fs.project,
+      selectedNode: globalState.fs.selectedNode,
+      isLogged: globalState.login.authToken!= undefined,
   };
 };
-export default FileBrowserComponent;
+export default connect(mapStateToProps)(FileBrowserComponent);
 

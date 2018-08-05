@@ -2,13 +2,18 @@ import React from 'react';
 import {Provider} from 'react-redux';
 import {Router, Route, IndexRoute, browserHistory} from 'react-router';
 import IDEComponent from './components/ide/IDEComponent.jsx';
+import AuthLayout from './components/login/AuthLayout.jsx';
+import Login from './components/login/Login.jsx';
 import {reduxStore} from './reduxStore';
 
-import './styles/base.scss';
 import 'antd/dist/antd.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import './styles/base.scss';
+
 
 export const routes = (
     <Route path="/" >
+        <Route path="login" component={Login}/>
         <IndexRoute component={IDEComponent}/>
     </Route>
 );

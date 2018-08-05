@@ -5,14 +5,16 @@ import EditorComponent from './EditorComponent.jsx'
 import FileBrowser from './FileBrowser.jsx'
 import Outline from './Outline.jsx'
 import Toolbar from './Toolbar.jsx'
-import {File, Project, Folder} from './model.js'
+import {Folder, defaultText} from '../../model/model'
 import Console from './Console.jsx'
 import Problems from './Problems.jsx'
 import Splitter from 'm-react-splitters';
+import Modals from './Modals.jsx';
 import 'm-react-splitters/lib/splitters.css';
-import {
-    createFolder, updateFile, loadProject, createProject, deleteFile
-} from '../../actions/fileSystem.jsx';
+import remoteFileSystem from '../../actions/remoteFileSystem.jsx';
+import localFileSystem from '../../actions/localFileSystem.jsx';
+import Login from '../login/Login.jsx';
+
 
 
   const TabPane = Tabs.TabPane;
@@ -25,15 +27,27 @@ class IDEComponent extends Component {
             openFiles:[],
             editorTabIndex: undefined,
             bottomTabIndex:'console',
-            runningConsole:false
+            runningConsole:false,
+            modal:{show:false}
         };
     }
 
+    get fileSystem(){
+        if(this.props.isLogged){
+            return remoteFileSystem
+        }else{
+            return localFileSystem
+        }
+    }
+    
+
     openProject = (projectName) => {
-        this.props.dispatch(loadProject(projectName));
+        this.props.dispatch(this.fileSystem.loadProject(projectName));
+        this.setState({openFiles: [], file: undefined})
     }
     newProject = (projectName) => {
-        this.props.dispatch(createProject(projectName));
+        this.props.dispatch(this.fileSystem.createProject(projectName));
+        this.setState({openFiles: [], file: undefined})
     }
 
     handleTabChange = (tabType) => (tabIndex) => {
@@ -41,6 +55,10 @@ class IDEComponent extends Component {
         newState[tabType] = tabIndex
         this.setState(newState);
     };
+
+    handleEditorTabIndex = (fileName) => {
+        this.handleSelectFile(this.state.openFiles.find(file => file.name == fileName));
+    }
 
     onSelectTab = (file) => () =>{
         this.setState({file})
@@ -68,7 +86,7 @@ class IDEComponent extends Component {
         // sessionStorage.setItem("project", JSON.stringify(this.state.project))
         
         this.setState({file})
-        this.props.dispatch(updateFile(file))
+        this.props.dispatch(this.fileSystem.updateFile(file))
         // var jsCode = compiler(ast)
     }
 
@@ -80,19 +98,30 @@ class IDEComponent extends Component {
     }
 
     closeFile(file){
-        return () =>{
+        return (e) =>{
+            e.stopPropagation();
             let newState = {openFiles:this.state.openFiles.filter( f=> f.name != file.name)}
-            newState.file = _.last(newState.openFiles)
-            if(newState.file){
-                newState.editorTabIndex = file.name
-            }else{
-                newState.editorTabIndex  = undefined
+            if(file.equals(this.state.file)){
+                newState.file = _.last(newState.openFiles)
+                if(newState.file){
+                    newState.editorTabIndex = newState.file.name
+                }else{
+                    newState.editorTabIndex  = undefined
+                }
             }
-            
-            
             this.setState(newState);    
         }
     }
+ 
+    componentWillReceiveProps(newProps) {
+        if (!newProps.project && this.state.openFiles.length > 0) {
+            this.setState({openFiles:[], file:undefined})
+          }
+
+        if (newProps.selectedNode && !newProps.selectedNode.isDirectory && (!this.state.file || newProps.selectedNode.completeName != this.state.file.completeName ) ) {
+          this.handleSelectFile(newProps.selectedNode)
+        }
+      }
 
     handleSelectFile = (file) =>{
         let index = this.state.openFiles.findIndex( f=> f.name == file.name)
@@ -127,31 +156,40 @@ class IDEComponent extends Component {
     }
 
     newFile =(fileProperties) =>{
-        var currentNode = this.refs.fileBrowser.selectedNode
-        var project = this.props.project
+        fileProperties.text = defaultText(fileProperties)
         fileProperties.isNew = true
-        var file = new File(fileProperties)
-        project.addFileToElement(file, currentNode)
-        // sessionStorage.setItem("project", JSON.stringify(this.props.project))
-        this.setState(project)
-        this.props.dispatch(updateFile(file))
+        if(this.props.selectedNode.idProject){
+            fileProperties.path = this.props.selectedNode.path + this.props.selectedNode.name
+        }else if(this.props.selectedNode.isDirectory){
+            fileProperties.path = this.props.selectedNode.path + "/" + this.props.selectedNode.name
+        }else{
+            fileProperties.path = this.props.selectedNode.path
+        }
+
+        this.props.dispatch(this.fileSystem.updateFile(fileProperties))
     }
 
     
     newFolder =(folderName) =>{
-        var currentNode = this.refs.fileBrowser.selectedNode
         var project = this.props.project
         var folder = new Folder({name:folderName})
-        project.addFolderToElement(folder, currentNode)
+        project.addFolderToElement(folder, this.props.selectedNode)
         this.setState(project)
-        this.props.dispatch(createFolder(folder))
+        this.props.dispatch(this.fileSystem.createFolder(folder))
     }
 
     deleteElement = (element) =>{
         if(!element.isDirectory){
-            this.props.dispatch(deleteFile(element))
+            let index = this.state.openFiles.findIndex( f=> f.name == element.name)
+            if(index>=0){
+                this.closeFile(element)()
+            }
+            this.props.dispatch(this.fileSystem.deleteFile(element))
+        }else{
+            this.props.dispatch(this.fileSystem.deleteFolder(element))
         }
     }
+
 
     runCommand = (command) =>{
         if(this.currentEditor){
@@ -163,23 +201,38 @@ class IDEComponent extends Component {
 
     }
 
+    showDialog = (params)=> {
+        this.setState({
+            modal:{show:true, params:params}
+        })
+    }
+
+    hideDialog = ()=> {
+        this.setState({modal:{show:false}})
+    }
+
+    confirmModal = (result) =>{
+        this.state.modal.params.confirm(result)
+        this.setState({modal:{show:false}})
+    }
+
     render() {
         return (
             <div className="ide-container">
                 <div className="header">
-                    <Toolbar runCode={this.runCode} runCommand={this.runCommand} newFile={this.newFile} newFolder={this.newFolder} openProject={this.openProject} 
-                    newProject={this.newProject} saveFile={()=> this.onSaveFile()}/>
+                    <Toolbar runCode={this.runCode} fileSystem={this.fileSystem} runCommand={this.runCommand} newFile={this.newFile} newFolder={this.newFolder} openProject={this.openProject} 
+                    newProject={this.newProject} saveFile={()=> this.onSaveFile()} showDialog={this.showDialog} />
                 </div>
                 <Splitter position="vertical" 
                     className="body"
                     primaryPaneMaxWidth="30%"
-                    primaryPaneMinWidth="200px"
+                    primaryPaneMinWidth="200px" 
                     primaryPaneWidth="250px"
                 >
-                    <Splitter position="horizontal"  primaryPaneMaxHeight="90%" primaryPaneHeight="80%" className="left-panel">
+                    <Splitter position="horizontal"  primaryPaneMaxHeight="90%" primaryPaneHeight="50%" className="left-panel">
                         <div className='left-panel-top'>
                             <div className='file-browser'>
-                                <FileBrowser ref="fileBrowser" project={this.props.project} selectFile={this.handleSelectFile} rename={this.rename} deleteElement={this.deleteElement}/>
+                                <FileBrowser fileSystem={this.fileSystem} selectFile={this.handleSelectFile} rename={this.rename} deleteElement={this.deleteElement} showDialog={this.showDialog} newFile={this.newFile} newFolder={this.newFolder} />
                             </div>
                         </div>
                         <div >
@@ -196,7 +249,7 @@ class IDEComponent extends Component {
                             {
                                 // <EditorComponent mode="wollok" value={this.state.code} onChange={ (code, event) => this.setState({ ...this.state, code }) } />
                             }
-                            <Tabs  activeKey={this.state.editorTabIndex} onChange={this.handleTabChange("editorTabIndex")} className="tabs" animated={false}>
+                            <Tabs  activeKey={this.state.file?this.state.file.name:undefined} onChange={this.handleEditorTabIndex } className="tabs" animated={false}>
                                 {this.state.openFiles.map( file=> 
                                 <TabPane key={file.name}  tab={
                                     <span>
@@ -212,8 +265,6 @@ class IDEComponent extends Component {
                                     
                                 </TabPane> )}
                             </Tabs>
-
-                           
                         </div>
                         <Tabs activeKey={this.state.bottomTabIndex} animated={false} onChange={this.handleTabChange("bottomTabIndex")} className="tabs bottom-tabs fullHeight " className="tabs">
                             <TabPane key="console" tab={<span>Console  {this.state.runningConsole && <Icon type='pause-circle' className="console-icon-stop" onClick={this.refs.console.stop}/>} </span> }> 
@@ -230,6 +281,10 @@ class IDEComponent extends Component {
                         </Tabs>
                     </Splitter>
                 </Splitter>
+
+                {this.state.modal.show && <Modals params={this.state.modal.params} hideDialog={this.hideDialog} confirm={this.confirmModal} active={this.state.modal.show} />}
+
+                <Login />
             </div>
         );
     }
@@ -240,6 +295,9 @@ IDEComponent.propTypes = {
 const mapStateToProps = (globalState) => {
     return {
         project: globalState.fs.project,
+        selectedNode: globalState.fs.selectedNode,
+        projectUpdates: globalState.fs.updates,
+        isLogged: globalState.login.authToken!= undefined,
     };
 };
 export default connect(mapStateToProps)(IDEComponent);

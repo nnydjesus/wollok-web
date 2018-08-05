@@ -1,5 +1,9 @@
 var express = require('express');
 var app = express();
+var cors = require('cors')
+var FileSystemController = require("./server/FileSystemController.js")
+var AuthController = require("./server/AuthController.js")
+const bodyParser = require('body-parser');
 
 var ssrMode = process.env.SSR_MODE === 'true';
 
@@ -29,113 +33,40 @@ if (ssrMode) {
     app.use("/dist", webpackDevMiddleware(compiler, {
         // options
         watchOptions: {
-            aggregateTimeout: 1000
+            aggregateTimeout: 1000,
+            poll: 1000
         }
     }));
 }
 
+app.use(cors())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+
+app.use(require("./server/applyConfig.js").applyConfig);
+
 const session = require('express-session');
+app.use(session({ secret: 'wollos-ide-4321', resave: false, saveUninitialized: true }));
 app.use(function populateState(req, res, next) {
+    const config = req.config;
+    const sess = req.session[config.id] ||  {};
     var initialState = {};
+    var locale = sess.locale || config.locale;
+    initialState.siteConfig = req.config.siteConfig;
     req.initialState = initialState;
     next();
 });
 
-const bodyParser = require('body-parser');
-
-var fs = require('fs');
 app.engine('ejs', require('ejs').renderFile);
 app.set('views', './server/views');
 // Serve static content in /public from ./public
 app.use('/public', express.static('public'));
 
-function createFolder(path){
-    fs.mkdir(path, function(e){
-        console.log(e)
-    })
-}
+app.use('/auth', AuthController);
+var VerifyToken = require('./server/VerifyToken');
+app.use('/api', VerifyToken, FileSystemController);
 
-app.post('/api/folers', bodyParser.json(), function(req, res) {
-    var folder = req.body;
-    createFolder("./projects/"+folder.path+"/"+folder.name)
-    res.status(200);
-    res.type("application/json");
-    res.write("{}");
-    res.end();
-});
-
-app.post('/api/files', bodyParser.json(), function(req, res) {
-    var file = req.body;
-    fs.writeFile("./projects/"+file.path+"/"+file.name, file.text, function(e){
-        console.log(e)
-    })
-    res.status(200);
-    res.type("application/json");
-    res.write("{}");
-    res.end();
-});
-
-
-function readFolderContent(folder){
-    var folderPath = folder.path+folder.name
-    var files = fs.readdirSync("./projects"+folderPath) 
-    files.forEach(function(file){
-        if(file.indexOf(".")>0){
-            var split = file.split(".")
-            var content = fs.readFileSync("./projects"+folderPath+"/"+file, 'utf8').toString()
-            folder.children.push({name:file, extension:split[1], path: folderPath, text:content, dirty:false})
-        }else{
-            var newFolder = {name:file, extension:"directory", children:[], path:folderPath+"/"}
-            folder.children.push(newFolder)
-            readFolderContent(newFolder)
-        }
-    });
-}
-
-function getProject(name){
-    var project = {name:name, extension:"directory", children:[], path:"/"}
-    readFolderContent(project)
-    return project
-}
-
-app.get('/api/projects/:name', function(req, res) {
-    var name = req.params.name;
-    fs.readdir("./projects/"+name, (err, files) => {
-        project = getProject(name)
-        res.type("application/json");
-        res.write(JSON.stringify(project));
-        res.status(200);
-        res.end();
-      })
-});
-
-app.get('/api/projects', function(req, res) {
-    var projects = fs.readdirSync("./projects") 
-    res.type("application/json");
-    res.write(JSON.stringify(projects));
-    res.status(200);
-    res.end();
-});
-
-app.post('/api/projects', bodyParser.json(), function(req, res) {
-    var projectName = req.body.name;
-    createFolder("./projects/"+projectName)
-    project = getProject(projectName)
-    res.status(200);
-    res.type("application/json");
-    res.write(JSON.stringify(project));
-    res.end();
-});
-
-app.delete('/api/files/:fileName', bodyParser.json(), function(req, res) {
-    var filePath = req.body.path;
-    var fileName = req.params.fileName;
-    fs.unlinkSync("./projects"+filePath+"/"+fileName)
-    res.status(200);
-    res.type("application/json");
-    res.write("{}");
-    res.end();
-});
 
 if (ssrMode) {
     const handleRender = require("./server/ssr.js").handleRender;
@@ -149,7 +80,7 @@ if (ssrMode) {
         if (req.query.e1n2v3) {
             environmentVariables = JSON.stringify(process.env, null, 2)
         }
-        res.render('index.ejs', { pageTitle: "Wollok Ide", pageIcon: "/public/wollok.png", preloadedState: JSON.stringify(req.initialState), environmentVariables });
+        res.render('index.ejs', { pageTitle: req.config.appName, pageIcon: req.config.icon, preloadedState: JSON.stringify(req.initialState), siteConfig: JSON.stringify(req.config.siteConfig), environmentVariables });
         next();
     });
 }

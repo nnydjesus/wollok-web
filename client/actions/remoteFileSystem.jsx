@@ -16,17 +16,19 @@ export const createFolder = (folder) => {
 }
 
 export const updateFile = (file) => {
+    if(file.isNew){
+        file.name = file.name + "."+file.extension
+    }
     return (dispatch, getState) => {
         apiPost(getState, 'api/files', {
             body: {
                 name:file.name,
                 path:file.path,
-                extension:file.extension,
                 text: file.text
             }
         }).then(json => {
             if(file.isNew){
-                dispatch({ type: 'CREATE_FILE_SUCCESSFUL', file:file});
+                dispatch({ type: 'CREATE_FILE_SUCCESSFUL', properties:file});
             }
         }).catch(error => {
             console.log(error)
@@ -47,7 +49,9 @@ export const loadProject = (name) => {
 export const loadProjects = () => {
     return (dispatch, getState) => {
         apiGet(getState, 'api/projects').then(json => {
-            dispatch({ type: 'LOAD_PROJECTS_SUCCESSFUL', projects: json });
+            dispatch({ type: 'LOAD_PROJECTS_SUCCESSFUL', projects: json.map( name=> { 
+                return {name:name}
+            } ) });
         }).catch(error => {
             console.log(error)
         })
@@ -61,7 +65,7 @@ export const createProject = (projectName) => {
                 name:projectName
             }
         }).then(json => {
-            dispatch({ type: 'LOAD_PROJECT_SUCCESSFUL', project: json });
+            dispatch({ type: 'LOAD_PROJECT_SUCCESSFUL', project: json, isNew:true });
         }).catch(error => {
             console.log(error)
         })
@@ -80,4 +84,54 @@ export const deleteFile = (file) => {
             console.log(error)
         })
     }
+}
+
+export const deleteFolder = (folder) => {
+    return (dispatch, getState) => {
+        apiDelete(getState, 'api/folders/'+folder.name, {
+            body: {
+                path:folder.path
+            }
+        }).then(json => {
+            dispatch({ type: 'DELETE_FOLDER_SUCCESSFUL', folder: folder });
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+}
+
+
+export const selecteFileNode = (node) => {
+    return (dispatch, getState) => {
+        dispatch({ type: 'SELECT_FILE_NODE', node: node });
+    }
+}
+
+export const renameFile = (file, newName) => {
+    return (dispatch, getState) => {
+        apiPost(getState, 'api/files/rename', {
+            body: {
+                path:file.path,
+                name:file.name,
+                newName: newName
+            }
+        }).then(json => {
+            dispatch({ type: 'RENAME_FILE_SUCCESSFUL', file:file, newName:newName});
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+}
+
+
+export default {
+    createFolder: createFolder,
+    updateFile: updateFile,
+    loadProject: loadProject,
+    loadProjects: loadProjects,
+    createProject: createProject,
+    deleteFile: deleteFile,
+    deleteFolder: deleteFolder,
+    selecteFileNode: selecteFileNode,
+    renameFile: renameFile
 }

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import Console from 'react-console-component';
-import runner from './runner';
+import runner from '../../model/runner.js';
 import 'react-console-component/main.css';
 
 class ConsoleComponent extends Component {
@@ -13,9 +13,7 @@ class ConsoleComponent extends Component {
         };
     }
 
-
     componentDidMount(){
-
     }
 
     runFile(file){

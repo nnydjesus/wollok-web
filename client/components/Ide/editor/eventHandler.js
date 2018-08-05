@@ -1,5 +1,5 @@
-import astFinder from '../model/astFinder.js'
-import astDescription from '../model/astDescription.js'
+import astFinder from '../../../model/astFinder.js'
+import astDescription from '../../../model/astDescription.js'
 
 var ace = undefined
 var event = undefined

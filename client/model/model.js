@@ -31,6 +31,18 @@ export class File{
     get isDirectory(){
         return false
     }
+    
+    get completeName(){
+        return this.path + this.name
+    }
+
+    compile(){
+        this.parse()
+    }
+
+    equals(other){
+        return this.name == other.name && this.path == other.path
+    }
 }
 
 export class Folder {
@@ -59,6 +71,14 @@ export class Folder {
         return true
     }
 
+    get completeName(){
+        return this.path + this.name
+    }
+
+    getFileByName(fileName){
+        return this.children.find(children => children.name == fileName && !children.isDirectory)
+    }
+
     addFile(file){
         var folder = this.findFolderByPath(file.path)
         folder.children.push(file);
@@ -82,15 +102,34 @@ export class Folder {
           }
         })
         return element
-      }
+    }
 
+    find(element){
+        if(element.extension == 'directory'){
+            return this.findFolderByPath(element.path+"/"+element.name)
+        }else{
+            var parent = this.findFolderByPath(element.path)
+            return parent.getFileByName(element.name)
+        }
+    }
+
+    equals(other){
+        return this.name == other.name && this.path == other.path
+    }
+
+    compile(){
+        this.children.forEach(children => children.compile() )
+    }
 
 }
 
 export class Project extends Folder {
 
+
     addFolderToElement(folder, element){
-        if(element.isDirectory){
+        if(element.isProject){
+            folder.path = element.path  + element.name
+        }else if(element.isDirectory){
             folder.path = element.path + "/" + element.name
         }else{
             folder.path = element.path
@@ -100,13 +139,32 @@ export class Project extends Folder {
     }
 
     addFileToElement(file, element){
-        if(element.isDirectory){
+        if(element.isProject){
+            file.path = element.path + element.name
+        }else if(element.isDirectory){
             file.path = element.path + "/" + element.name
         }else{
             file.path = element.path
         }
-
         this.addFile(file)
     }
+
+    incrUpdates(){
+        this.updates += 1
+    }
+
+    get isProject(){
+        return true
+    }
   
+}
+
+export const defaultText = (fileProperties) => {
+    switch(fileProperties.type){
+        case "object": return `object ${fileProperties.name} {\n \n}`
+        case "class": return `class ${fileProperties.name} {\n \n}`
+        case "program": return `program ${fileProperties.name} {\n \t console.println('Hello Wollok') \n}`
+        case "test": return `test "${fileProperties.name}" {\n \t assert.that(true) \n}`
+    }
+
 }

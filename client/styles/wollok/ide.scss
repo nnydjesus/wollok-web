@@ -93,6 +93,17 @@
 	pointer-events: none;
 }
 
+.modalContainer{
+    width:600px;
+    background: none;
+    position: absolute;
+    top: 100px;
+
+    .close{
+        display: none;
+    }
+}
+
 
 #contentRoot{
     height: 100vh;
@@ -119,14 +130,61 @@
             z-index: 100;
             background-color: $header_color;
 
+            .login {
+                height: 60px;
+                width: 250px;
+                float: left;
+
+                .btn-login{
+                    text-align: center;
+                    height: 100%;
+                    background: $color_wollok;
+                    font-size: 20px;
+                }
+
+                .logout{
+                    .btn-logout {
+                        width: 100px;
+                        background: $color_logout;
+                        position: absolute;
+                        right: 0;
+                    }
+                    .user-avatar{
+                        background: url(/public/user-avatar.svg) center center no-repeat;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 100%;
+                        display: block;
+                        overflow: hidden;
+                        background-size: cover!important;
+                        float: left;
+                        margin: 10px 0 0;
+                    }
+
+                    .username{
+                        width: 100px;
+                        float: left;
+                        text-align: center;
+                        height: 100%;
+                        margin: 20px 3px 0;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+            }
+            
+
             .toolbar{
-                width: 100%;
-                height: 30px;
+                height: 60px;
+                float: left;
+                width: calc(100vw - 250px);
 
                 .ant-menu-horizontal{
                     height: 30px;
                     line-height: 25px;
                     background-color: transparent;
+                    border-bottom: none;
                     .ant-menu-submenu-horizontal{
                         .ant-menu-submenu-title{
                             padding: 0 10px;
@@ -135,7 +193,11 @@
                     }
                     .ant-menu-item{
                         padding: 0 10px;
+                        border-bottom: none;
                         color: white;
+                        &:hover{
+                            color:#1890ff;
+                        }
                     }
                 }
 
@@ -151,6 +213,16 @@
                     }
                 }
 
+                .logo{
+                    background-image: url(/public/wollok.png);
+                    background-size: 20px;
+                    display: block;
+                    width: 20px;
+                    height: 27px;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                }
+
                 .separator{
                     width: 1px;
                     height: 14px;
@@ -164,7 +236,7 @@
         
         .body{
             position: relative;
-            top: 30px;
+            top: 60px;
             padding-bottom: 30px;
         }
 
@@ -362,6 +434,14 @@
                         top: -2px;
                         left: -43px;
                     }
+                }
+
+                .login{
+                    color: white;
+                    font-size: 15px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
             }
 

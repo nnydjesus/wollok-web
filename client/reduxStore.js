@@ -2,6 +2,7 @@ import React from 'react';
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import fsReducer from './reducers/fileSystem.jsx';
+import loginReducer from './reducers/login.jsx';
 import { loadTranslations, setLocale, syncTranslationWithStore, i18nReducer, I18n } from 'react-redux-i18n';
 
 export const reduxStore = (initialState) => {
@@ -18,7 +19,8 @@ export const reduxStore = (initialState) => {
 
     let store = createStore(combineReducers({
         siteConfig: siteConfigReducer,
-        fs: fsReducer
+        fs: fsReducer,
+        login: loginReducer,
         
     }), initialState, applyMiddleware(thunk));
 

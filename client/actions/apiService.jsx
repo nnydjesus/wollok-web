@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
-import FormData from 'form-data';
 
-export const API_HOST = "http://localhost:3000"
+export const API_HOST = (typeof window !== "undefined" && window.__CONFIG__ ? window.__CONFIG__.apiHost : global.__CONFIG__.apiHost);
 
 function toQueryParams(params) {
     return Object.keys(params)
@@ -14,7 +13,7 @@ export function apiFetch(getState, endpoint, { isBlob = false, isText = false, m
     return fetch(`${API_HOST}/${endpoint}` + queryParams, {
         headers: {
             'content-type': 'application/json',
-            'X-API-Version': '2',
+            'Authorization': getState().login.authToken,
             ... headers
         },
         method,

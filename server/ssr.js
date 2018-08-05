@@ -19,7 +19,7 @@ export const handleRender = (req, res) => {
         } else if (props) {
             // if we got props, that means we found a valid component to render
             // for the given route
-            const siteConfig = {};
+            const siteConfig = req.config.siteConfig;
             props.params.siteConfig = siteConfig;
             const html = renderToString(<Provider store={store}><RouterContext {...props} /></Provider>);
 
@@ -33,7 +33,7 @@ export const handleRender = (req, res) => {
             }
 
             // render index.ejs, but pass in the markup we want it to display and preloaded state
-            res.render('index.ejs', { pageTitle: req.config.appName, pageIcon: req.config.icon, markup: html, preloadedState: JSON.stringify(preloadedState), siteConfig: JSON.stringify(siteConfig), environmentVariables });
+            res.render('index.ejs', { pageTitle: siteConfig.appName, pageIcon: siteConfig.icon, markup: html, preloadedState: JSON.stringify(preloadedState), siteConfig: JSON.stringify(siteConfig), environmentVariables });
         } else {
             // TODO custom 404 view
             // no route match, so 404

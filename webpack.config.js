@@ -134,7 +134,7 @@ var config = {
         'NODE_ENV': JSON.stringify('production')
       }
     }),
-    new webpack.optimize.UglifyJsPlugin(), // Minify everything
+    // new webpack.optimize.UglifyJsPlugin(), // Minify everything
     new webpack.optimize.AggressiveMergingPlugin(), // Merge chunks
     new CompressionPlugin({ // Compress bundle.js and styles.css
       asset: "[path].gz[query]",
