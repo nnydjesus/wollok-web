@@ -6,17 +6,14 @@ export const createFolder = (folder) => {
 
 export const updateFile = (file) => {
     return (dispatch, getState) => {
-        if(file.isNew){
-            file.name = file.name + "."+file.extension
-            dispatch({ type: 'CREATE_FILE_SUCCESSFUL', properties:file});
-        }
+        dispatch({ type: 'UPDATE_FILE_SUCCESSFUL', properties:file, sha:""});
     }
 }
 
 export const createFile = (file) => {
     return (dispatch, getState) => {
         file.name = file.name + "."+file.extension
-        dispatch({ type: 'CREATE_FILE_SUCCESSFUL', properties:file});
+        dispatch({ type: 'CREATE_FILE_SUCCESSFUL', properties:file, sha:""});
     }
 }
 
@@ -67,6 +64,7 @@ export const renameFile = (file, newName) => {
 
 export default {
     createFolder: createFolder,
+    createFile: createFile,
     updateFile: updateFile,
     loadProject: loadProject,
     loadProjects: loadProjects,

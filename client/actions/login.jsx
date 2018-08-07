@@ -75,5 +75,6 @@ export const saveCompeteProject = (dispatch, getState) => {
         dispatch({ type: 'SAVE_COMPLETE_PROJECT_SUCCESSFUL', project:json });
     }).catch(error => {
         console.log(error)
+        dispatch({ type: 'COMPLETE_PROJECT_FAILED', error:error });
     })
 }

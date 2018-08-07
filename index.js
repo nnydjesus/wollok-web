@@ -1,8 +1,6 @@
 var express = require('express');
 var app = express();
 var cors = require('cors')
-var FileSystemController = require("./server/FileSystemController.js")
-var AuthController = require("./server/AuthController.js")
 const bodyParser = require('body-parser');
 
 var ssrMode = process.env.SSR_MODE === 'true';

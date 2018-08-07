@@ -5,6 +5,7 @@ const initialEventsState = {
     project: undefined,
     selectedNode: undefined,
     updates: 0,
+    loading: false,
     projects: [],
     loadgingSaveCompleteProject: false
 }
@@ -13,6 +14,12 @@ const initialEventsState = {
 const fsReducer = (state = initialEventsState, action) => {
    
     return ({
+        START_LOAD_PROJECT: () => {
+            return{
+                ...state,
+                loading: true
+            }
+        },
         
         LOAD_PROJECT_SUCCESSFUL: () => {
             action.project.updates = 0
@@ -27,9 +34,17 @@ const fsReducer = (state = initialEventsState, action) => {
                 ...state,
                 updates: 0,
                 project: project,
+                loading: false,
                 projects: action.isNew?[...state.projects, project]:state.projects,
                 selectedNode: project
             };
+        },
+
+        LOAD_PROJECT_FAILED: () => {
+            return{
+                ...state,
+                loading: false
+            }
         },
 
         SAVE_COMPLETE_PROJECT_SUCCESSFUL: () => {
@@ -44,13 +59,29 @@ const fsReducer = (state = initialEventsState, action) => {
             };
         },
 
+        START_LOAD_PROJECTS: () => {
+            return{
+                ...state,
+                loading: true
+            }
+        },
+
         LOAD_PROJECTS_SUCCESSFUL: () => {
             return {
                 ...state,
                 projects: action.projects, 
-                updates: state.updates + 1
+                updates: state.updates + 1,
+                loading: false,
             };
         },
+
+        LOAD_PROJECTS_FAILED: () => {
+            return{
+                ...state,
+                loading: false
+            }
+        },
+
         DELETE_FILE_SUCCESSFUL: () =>{
             var folder = state.project.findFolderByPath(action.file.path)
             _.remove(folder.children, c => c.name == action.file.name)
@@ -112,14 +143,21 @@ const fsReducer = (state = initialEventsState, action) => {
         START_SAVE_COMPLETE_PROJECT: () => {
             return {
                 ...state,
-                loadgingSaveCompleteProject: true
+                loading: true
             }
         },
 
         START_SAVE_COMPLETE_SUCCESSFUL: () => {
             return {
                 ...state,
-                loadgingSaveCompleteProject: false
+                false: false
+            }
+        },
+
+        SAVE_COMPLETE_FAILED: () => {
+            return {
+                ...state,
+                false: false
             }
         },
 

@@ -1,5 +1,5 @@
-import React, {Component, PropTypes} from 'react';
-import { Tabs, Button, Icon } from 'antd';
+import React, {Component} from 'react';
+import { Tabs, Icon } from 'antd';
 import { connect } from 'react-redux';
 import EditorComponent from './EditorComponent.jsx'
 import FileBrowser from './FileBrowser.jsx'
@@ -14,6 +14,7 @@ import 'm-react-splitters/lib/splitters.css';
 import remoteFileSystem from '../../actions/remoteFileSystem.jsx';
 import localFileSystem from '../../actions/localFileSystem.jsx';
 import Login from '../login/Login.jsx';
+import Loader from '../library/Loader.jsx'
 
 
 
@@ -158,6 +159,7 @@ class IDEComponent extends Component {
     newFile =(fileProperties) =>{
         fileProperties.text = defaultText(fileProperties)
         fileProperties.isNew = true
+        fileProperties.type = "file"
         
         if(this.props.selectedNode.isDirectory){
             fileProperties.path = this.props.selectedNode.path + this.props.selectedNode.name
@@ -172,6 +174,7 @@ class IDEComponent extends Component {
     newFolder =(folderName) =>{
         var project = this.props.project
         var folder = new Folder({name:folderName})
+        folder.type = "folder"
         project.addFolderToElement(folder, this.props.selectedNode)
         this.setState(project)
         this.props.dispatch(this.fileSystem.createFolder(folder))
@@ -284,6 +287,7 @@ class IDEComponent extends Component {
                 {this.state.modal.show && <Modals params={this.state.modal.params} hideDialog={this.hideDialog} confirm={this.confirmModal} active={this.state.modal.show} />}
 
                 <Login />
+                {this.props.loading && <Loader />}
             </div>
         );
     }
@@ -297,6 +301,7 @@ const mapStateToProps = (globalState) => {
         selectedNode: globalState.fs.selectedNode,
         projectUpdates: globalState.fs.updates,
         isLogged: globalState.login.authToken!= undefined,
+        loading: globalState.fs.loading,
     };
 };
 export default connect(mapStateToProps)(IDEComponent);

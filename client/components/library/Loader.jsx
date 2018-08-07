@@ -1,15 +1,20 @@
 import React, { Component } from 'react';
+import Loader1 from '../../../resources/ui/loader1.svg'
+import Loader2 from '../../../resources/ui/loader2.svg'
 
 class Loader extends Component {
 
     render() {
         return (
-            <div className="loader" style={this.props.style}>
-                <span className="loader-animation load1"></span>
-                <span className="loader-animation load2"></span>
-                <span className="loader-animation load3"></span>
-                <span className="loader-animation load4"></span>
-                <span className="loader-animation load5"></span>
+            <div className="loading_container">
+                <div className="loading">
+                    <div className="loading__ring">
+                        <Loader1/>
+                    </div>
+                    <div className="loading__ring">
+                        <Loader2/>
+                    </div>
+                </div>
             </div>
         );
     }

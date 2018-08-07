@@ -28,7 +28,7 @@ export function apiFetch(getState, endpoint, { isBlob = false, isText = false, m
                     return response.text();
                 }
                 return response.json();
-            } else if (response.status == 204) {
+            } else if (response.status == 204 || response.status == 201) {
                 return {};
             } else if (response.status === 500) {
                 throw { id: "serverError", jsonResponse: response.json() };

@@ -45,7 +45,7 @@ export class File{
     }
 
     toJson(){
-        return {name:this.name, extension: this.extension, path:this.path, text: this.text}
+        return {name:this.name, extension: this.extension, path:this.path, text: this.text, type: "file"}
     }
 }
 
@@ -126,7 +126,7 @@ export class Folder {
     }
 
     toJson(){
-        return {name:this.name, path:this.path, extension:this.extension, children: this.children.map(children => children.toJson())}
+        return {name:this.name, path:this.path, extension:this.extension, type:"dir", children: this.children.map(children => children.toJson())}
     }
 
 }

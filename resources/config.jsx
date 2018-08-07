@@ -13,7 +13,7 @@ if (typeof window === 'undefined') {
         case "local":
             break;
         case "production":
-            global.__CONFIG__.apiHost = "https://wollok.herokuapp.com";
+            global.__CONFIG__.apiHost = "https://wollok-server.herokuapp.com";
             break;
     }
 }
