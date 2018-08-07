@@ -99,7 +99,7 @@ class IDEComponent extends Component {
 
     closeFile(file){
         return (e) =>{
-            e.stopPropagation();
+            if(e)   e.stopPropagation();
             let newState = {openFiles:this.state.openFiles.filter( f=> f.name != file.name)}
             if(file.equals(this.state.file)){
                 newState.file = _.last(newState.openFiles)
@@ -158,15 +158,14 @@ class IDEComponent extends Component {
     newFile =(fileProperties) =>{
         fileProperties.text = defaultText(fileProperties)
         fileProperties.isNew = true
-        if(this.props.selectedNode.idProject){
+        
+        if(this.props.selectedNode.isDirectory){
             fileProperties.path = this.props.selectedNode.path + this.props.selectedNode.name
-        }else if(this.props.selectedNode.isDirectory){
-            fileProperties.path = this.props.selectedNode.path + "/" + this.props.selectedNode.name
         }else{
             fileProperties.path = this.props.selectedNode.path
         }
 
-        this.props.dispatch(this.fileSystem.updateFile(fileProperties))
+        this.props.dispatch(this.fileSystem.createFile(fileProperties))
     }
 
     

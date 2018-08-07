@@ -17,7 +17,10 @@ class ProblemsComponent extends Component {
     }
 
     render() {
-        var errors = _.flatMap(this.props.project.files, file => file.errors || [] )
+        var errors = []
+        if(this.props.project){
+            errors = _.flatMap(this.props.project.files, file => file.errors || [] )
+        } 
         return (
             <div className="problems">
                 <p className="description"> {errors.length} Errores</p>

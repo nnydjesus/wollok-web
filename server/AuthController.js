@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 var VerifyToken = require('./VerifyToken');
-var users = {nnydjesus: {username:"nnydjesus", password:"$2a$08$TcXwTUd/AaScMvUAb7vUgukiYrBocOb1j2NIyvwG0VPwpnEi5WkD2"}}
+var users = {test: {username:"test", password:"$2a$08$TcXwTUd/AaScMvUAb7vUgukiYrBocOb1j2NIyvwG0VPwpnEi5WkD2"}}
 
 /**
  * Configure JWT

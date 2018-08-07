@@ -32,6 +32,18 @@ const fsReducer = (state = initialEventsState, action) => {
             };
         },
 
+        SAVE_COMPLETE_PROJECT_SUCCESSFUL: () => {
+            var project = project = new Project(action.project)
+            project.compile()
+            return {
+                ...state,
+                updates: 0,
+                project: project,
+                projects: [project],
+                selectedNode: project.find(state.selectedNode)
+            };
+        },
+
         LOAD_PROJECTS_SUCCESSFUL: () => {
             return {
                 ...state,
@@ -59,8 +71,17 @@ const fsReducer = (state = initialEventsState, action) => {
 
         CREATE_FILE_SUCCESSFUL: () => {
             action.properties.isNew = false
+            action.properties.sha = action.sha
             var file = new File(action.properties)
             state.project.addFile(file)
+            return {
+                ...state, 
+                updates: state.updates + 1
+            }
+        },
+
+        UPDATE_FILE_SUCCESSFUL: () => {
+            action.file.sha = action.sha
             return {
                 ...state, 
                 updates: state.updates + 1

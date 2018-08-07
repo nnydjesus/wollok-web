@@ -1,8 +1,9 @@
+
 const initialEventsState = {
-    username: localStorage.getItem("username"),
+    username:undefined,
     inProgress: false,
     error: {},
-    authToken: localStorage.getItem("authToken"),
+    authToken: undefined,
     userLabel: undefined,
     userPicture: undefined,
     userLoginPicture: undefined,
@@ -12,11 +13,18 @@ const initialEventsState = {
     isSocial: false,
     previousUsers: [],
     showLogin: false,
-    finished: false
+    finished: false,
+    initialized: false
 }
 
-
 const loginReducer = (state = initialEventsState, action) => {
+    if(!state.initialized){
+        if(typeof window !== "undefined"){
+            state.username = localStorage.getItem("username")
+            state.authToken = localStorage.getItem("authToken")
+            state.initialized = true
+        }
+    }
    
     return ({
         START_LOGIN: () => {

@@ -1,8 +1,8 @@
-import { apiGet, apiPost, apiDelete } from './apiService.jsx';
+import { apiGet, apiPost, apiDelete, apiPut } from './apiService.jsx';
 
 export const createFolder = (folder) => {
     return (dispatch, getState) => {
-        apiPost(getState, 'api/folders', {
+        apiPost(getState, 'folders', {
             body: {
                 name:folder.name,
                 path:folder.path
@@ -16,20 +16,33 @@ export const createFolder = (folder) => {
 }
 
 export const updateFile = (file) => {
-    if(file.isNew){
-        file.name = file.name + "."+file.extension
-    }
     return (dispatch, getState) => {
-        apiPost(getState, 'api/files', {
+        apiPut(getState, 'files', {
+            body: {
+                name:file.name,
+                path:file.path,
+                sha:file.sha,
+                text: file.text
+            }
+        }).then(json => {
+            dispatch({ type: 'UPDATE_FILE_SUCCESSFUL', file, sha:json.sha});
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+}
+
+export const createFile = (file) => {
+    file.name = file.name + "."+file.extension
+    return (dispatch, getState) => {
+        apiPost(getState, 'files', {
             body: {
                 name:file.name,
                 path:file.path,
                 text: file.text
             }
         }).then(json => {
-            if(file.isNew){
-                dispatch({ type: 'CREATE_FILE_SUCCESSFUL', properties:file});
-            }
+            dispatch({ type: 'CREATE_FILE_SUCCESSFUL', properties:file, sha:json.sha});
         }).catch(error => {
             console.log(error)
         })
@@ -38,7 +51,7 @@ export const updateFile = (file) => {
 
 export const loadProject = (name) => {
     return (dispatch, getState) => {
-        apiGet(getState, 'api/projects/'+name).then(json => {
+        apiGet(getState, 'projects/'+name).then(json => {
             dispatch({ type: 'LOAD_PROJECT_SUCCESSFUL', project: json });
         }).catch(error => {
             console.log(error)
@@ -48,7 +61,7 @@ export const loadProject = (name) => {
 
 export const loadProjects = () => {
     return (dispatch, getState) => {
-        apiGet(getState, 'api/projects').then(json => {
+        apiGet(getState, 'projects').then(json => {
             dispatch({ type: 'LOAD_PROJECTS_SUCCESSFUL', projects: json.map( name=> { 
                 return {name:name}
             } ) });
@@ -60,7 +73,7 @@ export const loadProjects = () => {
 
 export const createProject = (projectName) => {
     return (dispatch, getState) => {
-        apiPost(getState, 'api/projects', {
+        apiPost(getState, 'projects', {
             body: {
                 name:projectName
             }
@@ -74,9 +87,11 @@ export const createProject = (projectName) => {
 
 export const deleteFile = (file) => {
     return (dispatch, getState) => {
-        apiDelete(getState, 'api/files/'+file.name, {
+        apiDelete(getState, 'files/'+file.name, {
             body: {
-                path:file.path
+                path:file.path,
+                name:file.name,
+                sha: file.sha,
             }
         }).then(json => {
             dispatch({ type: 'DELETE_FILE_SUCCESSFUL', file: file });
@@ -88,7 +103,7 @@ export const deleteFile = (file) => {
 
 export const deleteFolder = (folder) => {
     return (dispatch, getState) => {
-        apiDelete(getState, 'api/folders/'+folder.name, {
+        apiDelete(getState, 'folders/'+folder.name, {
             body: {
                 path:folder.path
             }
@@ -109,14 +124,15 @@ export const selecteFileNode = (node) => {
 
 export const renameFile = (file, newName) => {
     return (dispatch, getState) => {
-        apiPost(getState, 'api/files/rename', {
+        apiPost(getState, 'files/rename', {
             body: {
                 path:file.path,
                 name:file.name,
+                sha: file.sha,
                 newName: newName
             }
         }).then(json => {
-            dispatch({ type: 'RENAME_FILE_SUCCESSFUL', file:file, newName:newName});
+            dispatch({ type: 'RENAME_FILE_SUCCESSFUL', file:file, newName:newName, sha:json.sha});
         }).catch(error => {
             console.log(error)
         })
@@ -127,6 +143,7 @@ export const renameFile = (file, newName) => {
 export default {
     createFolder: createFolder,
     updateFile: updateFile,
+    createFile: createFile,
     loadProject: loadProject,
     loadProjects: loadProjects,
     createProject: createProject,

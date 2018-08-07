@@ -13,6 +13,14 @@ export const updateFile = (file) => {
     }
 }
 
+export const createFile = (file) => {
+    return (dispatch, getState) => {
+        file.name = file.name + "."+file.extension
+        dispatch({ type: 'CREATE_FILE_SUCCESSFUL', properties:file});
+    }
+}
+
+
 export const loadProject = (name) => {
     return (dispatch, getState) => {
         var project = getState().fs.projects.find(p => p.name == name)

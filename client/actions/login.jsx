@@ -1,15 +1,15 @@
 import { apiGet, apiPost, apiDelete } from './apiService.jsx';
 
-export const startLogin = (username, password) => {
+export const startLogin = (email, password) => {
     return (dispatch, getState) => {
         dispatch({ type: 'START_LOGIN'});
-        apiPost(getState, 'auth/login', {
+        apiPost(getState, 'auth/signin', {
             body: {
-                username:username,
-                password:password
+                email:email,
+                password:password,
             }
         }).then(json => {
-            dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username:username });
+            dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username: json.name });
             if(getState().fs.project){
                 saveCompeteProject(dispatch, getState)
             }
@@ -21,16 +21,17 @@ export const startLogin = (username, password) => {
 }
 
 
-export const startRegistration = (username, password) => { 
+export const startRegistration = (email, password, name) => { 
     return (dispatch, getState) => {
         dispatch({ type: 'START_LOGIN'});
-        apiPost(getState, 'auth/register', {
+        apiPost(getState, 'auth/signup', {
             body: {
-                username:username,
-                password:password
+                email:email,
+                password:password,
+                name:name
             }
         }).then(json => {
-            dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username:username });
+            dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username:json.name });
             if(getState().fs.project){
                 saveCompeteProject(dispatch, getState)
             }
@@ -68,10 +69,10 @@ export const hideLogin = () => {
 
 export const saveCompeteProject = (dispatch, getState) => {
     dispatch({ type: 'START_SAVE_COMPLETE_PROJECT' });
-    apiPost(getState, 'api/projects/complete', {
-        body: getState().fs.project
+    apiPost(getState, 'projects/complete', {
+        body: getState().fs.project.toJson()
     }).then(json => {
-        dispatch({ type: 'SAVE_COMPLETE_PROJECT_SUCCESSFUL' });
+        dispatch({ type: 'SAVE_COMPLETE_PROJECT_SUCCESSFUL', project:json });
     }).catch(error => {
         console.log(error)
     })

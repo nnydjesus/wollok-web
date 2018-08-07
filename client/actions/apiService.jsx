@@ -13,7 +13,7 @@ export function apiFetch(getState, endpoint, { isBlob = false, isText = false, m
     return fetch(`${API_HOST}/${endpoint}` + queryParams, {
         headers: {
             'content-type': 'application/json',
-            'Authorization': getState().login.authToken,
+            'Authorization': 'Bearer '+ getState().login.authToken,
             ... headers
         },
         method,

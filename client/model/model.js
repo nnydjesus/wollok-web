@@ -43,6 +43,10 @@ export class File{
     equals(other){
         return this.name == other.name && this.path == other.path
     }
+
+    toJson(){
+        return {name:this.name, extension: this.extension, path:this.path, text: this.text}
+    }
 }
 
 export class Folder {
@@ -121,16 +125,18 @@ export class Folder {
         this.children.forEach(children => children.compile() )
     }
 
+    toJson(){
+        return {name:this.name, path:this.path, extension:this.extension, children: this.children.map(children => children.toJson())}
+    }
+
 }
 
 export class Project extends Folder {
 
 
     addFolderToElement(folder, element){
-        if(element.isProject){
-            folder.path = element.path  + element.name
-        }else if(element.isDirectory){
-            folder.path = element.path + "/" + element.name
+        if(element.isDirectory){
+            folder.path = element.path + element.name
         }else{
             folder.path = element.path
         }

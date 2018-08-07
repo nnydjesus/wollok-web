@@ -63,9 +63,9 @@ app.set('views', './server/views');
 // Serve static content in /public from ./public
 app.use('/public', express.static('public'));
 
-app.use('/auth', AuthController);
-var VerifyToken = require('./server/VerifyToken');
-app.use('/api', VerifyToken, FileSystemController);
+// app.use('/auth', AuthController);
+// var VerifyToken = require('./server/VerifyToken');
+// app.use('/api', VerifyToken, FileSystemController);
 
 
 if (ssrMode) {

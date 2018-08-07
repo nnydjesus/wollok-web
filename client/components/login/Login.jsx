@@ -19,11 +19,9 @@ import {
 
 class Login extends Component {
 
-    state = {
-        username: "",
-        password: "",
-        mode: "login",
-        passwordError: undefined
+    constructor(props){
+        super(props)
+        this.state = this.defaultState()
     }
 
     componentDidMount() {
@@ -41,13 +39,25 @@ class Login extends Component {
         this.setState({[field]:value})
     };
 
+    defaultState(){
+        return {
+            username: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            name:"",
+            mode: "login",
+            passwordError: undefined
+        }
+    }
+
     handleLogin = () => {
         this.props.dispatch(startLogin(this.state.username, this.state.password));
     };
 
     handleRegister = () => {
         if(this.state.password == this.state.confirmPassword){
-            this.props.dispatch(startRegistration(this.state.username, this.state.password));
+            this.props.dispatch(startRegistration(this.state.email, this.state.password, this.state.name));
         }else{
             this.setState({passwordError:"Las contraseñas no coinciden"})
         }
@@ -71,6 +81,7 @@ class Login extends Component {
 
     onClose = () =>{
         this.props.dispatch(hideLogin())
+        this.setState(this.defaultState())
     }
 
     changeMode = (mode) => () =>{
@@ -107,9 +118,11 @@ class Login extends Component {
             <div >
                 <h2>Registrate</h2>
                 <div>
-                    <Input type="text" field="username" placeholder="E-mail" onChange={this.updateField('username')} value={this.state.username || ''}  focus={true}  className=""/>
+                    <Input type="text" field="email" placeholder="E-mail" onChange={this.updateField('email')} value={this.state.email || ''}  focus={true}  className=""/>
+                    <Input type="text" field="name" placeholder="Nombre" onChange={this.updateField('name')} value={this.state.name || ''}    className=""/>
                     <Input type="password" field="password" onChange={this.updateField('password')}  placeholder="Contraseña" value={this.state.password || ''}  className=""/>
                     <Input type="password" field="confirmPassword" onChange={this.updateField('confirmPassword')} onEnter={this.handleRegister} placeholder="Contraseña" value={this.state.confirmPassword || ''}  error={this.state.passwordError}  className=""/>
+                    
 
                     <div className="button-row">
                         <Button

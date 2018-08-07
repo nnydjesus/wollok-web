@@ -1,7 +1,7 @@
 // Default app config
 if (typeof window === 'undefined') {
     global.__CONFIG__ = {
-        apiHost: "http://localhost:3000",
+        apiHost: "http://localhost:3033",
         timeZone: "America/Argentina/Buenos_Aires"
     };
 
