@@ -2,12 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Input from '../library/Input.jsx';
-import { I18n } from 'react-redux-i18n';
 import Modal from 'react-responsive-modal';
 import FacebookLogin from 'react-facebook-login';
 import { Button } from 'antd';
-
-
 
 import {
     startLogin,
@@ -16,6 +13,10 @@ import {
     hideLogin,
     startRegistration
 } from '../../actions/login.jsx';
+
+const errors = {
+    authError: "El usuario o contraseña son inválidos"
+}
 
 class Login extends Component {
 
@@ -96,6 +97,13 @@ class Login extends Component {
                     <Input type="text" field="username" placeholder="E-mail" onChange={this.updateField('username')} value={this.state.username || ''}  focus={true}  className=""/>
                     <Input type="password" field="password" onChange={this.updateField('password')} onEnter={this.handleLogin} placeholder="Contraseña" value={this.state.password || ''}  className=""/>
 
+                      {
+                        this.props.error && this.props.error.show &&
+                        <div className="error">
+                            <span>{errors[this.props.error.label]? errors[this.props.error.label]: this.props.error.label}</span>
+                        </div>
+                    }
+
                     <div className="button-row">
                         <Button
                             id="loginLink"
@@ -122,7 +130,14 @@ class Login extends Component {
                     <Input type="text" field="name" placeholder="Nombre" onChange={this.updateField('name')} value={this.state.name || ''}    className=""/>
                     <Input type="password" field="password" onChange={this.updateField('password')}  placeholder="Contraseña" value={this.state.password || ''}  className=""/>
                     <Input type="password" field="confirmPassword" onChange={this.updateField('confirmPassword')} onEnter={this.handleRegister} placeholder="Contraseña" value={this.state.confirmPassword || ''}  error={this.state.passwordError}  className=""/>
-                    
+                  
+                    {
+                        this.props.error && this.props.error.show &&
+                        <div className="error">
+                            <i></i>
+                            <span>{errors[this.props.error.label]? errors[this.props.error.label]: this.props.error.label}</span>
+                        </div>
+                    }
 
                     <div className="button-row">
                         <Button

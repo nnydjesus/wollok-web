@@ -202,6 +202,12 @@ class FileBrowserComponent extends FileCreator {
           />
           </div>
         }
+        { false &&
+          <div className="loader_container">
+            <div className="loader">
+            </div>
+          </div>
+        }
       </div>
     );
   }

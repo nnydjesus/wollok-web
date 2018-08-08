@@ -64,6 +64,10 @@ input.form-control, textarea.form-control {
     input, select, textarea {color:#6C7B8A;border: solid 1px #EC5F5F!important;box-shadow: none !important;}
     .input-group-text {border: solid 1px #EC5F5F;box-shadow: none !important; border-right: none; background: #fff0f0}
 }
+
+.error{
+    color: #EC5F5F;
+}
         
 
 .btn { line-height: 43px; border-radius: 2px; font-size: 13px; outline: none !important; box-shadow: none !important}

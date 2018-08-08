@@ -46,30 +46,6 @@
       margin-bottom: 0px;
     }
 }
-.login-container .brand { margin-bottom: 40px; text-align: center;}
-.login-container .brand img , .login-container .brand svg { max-height: 50px;}
-.login-container .box { background: #fff; border-radius: 2px;padding: 25px;box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 25px;}
-.login-container .box input.form-control { margin-bottom: 15px;}
-.login-container .box input.form-control:focus { border: solid 1px $launcher_app_color}
-.login-container .box hr { margin: 20px -25px; opacity: 0.5;}
-.login-container .box a.recover { font-size: 12px; color: #888;}
-.login-container .box a.recover:hover { color: #222; text-decoration: underline !important;}
-.login-container .btn { background:$launcher_app_color; color: #fff !important; font-size: 20px; border-radius: 2px; line-height: 42px; padding: 2px 0; height: 48px;}
-.login-container .btn-facebook { background: #316a9b}
-
-.login-container .box .error {background:#fffaee; text-align: center; font-size: 12px; padding: 15px; margin-bottom: 25px; color: #7c7668}	
-.login-container .box h4 { display: block; font-size: 15px; margin-bottom: 25px;}
-.login-container .user { display: block; margin-bottom:10px; padding-bottom: 10px; border-bottom: solid 1px #fafafa; }
-.login-container .user div.avatar { display: block; width: 70px; height: 70px; position: relative; float: left; border-radius: 90px; border: solid 2px #fff; transition: 0.2s ease-in-out;}
-.login-container .user div.user-info { position: relative; float: left; padding: 15px 0 0 95px}
-.login-container .user div.user-info h2 { font-size: 16px;padding: 0px;margin: 0; color: #222; transition: 0.2s ease-in-out;}
-.login-container .user div.user-info span { font-size: 12px; color: #999}
- 
-.login-container .user:last-child  { margin-bottom:0; padding-bottom:0; border-bottom:none !important ; }
- .login-container .user:hover {	
- div.avatar { border: solid 2px $launcher_app_color;}
-   div.user-info h2 { color: $launcher_app_color;}
-}
  
  
 

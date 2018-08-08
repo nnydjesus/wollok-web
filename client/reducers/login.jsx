@@ -52,7 +52,7 @@ const loginReducer = (state = initialEventsState, action) => {
                 ...state,
                 inProgress: false,
                 error: {
-                    label: action.error.id,
+                    label: action.error,
                     show: true
                 }
             }

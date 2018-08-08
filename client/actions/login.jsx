@@ -15,7 +15,7 @@ export const startLogin = (email, password) => {
             }
         }).catch(error => {
             console.log(error)
-            dispatch({ type: 'LOGIN_FAILED', error:error });
+            dispatch({ type: 'LOGIN_FAILED', error:error.id });
         })
     }
 }
