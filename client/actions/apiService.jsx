@@ -38,6 +38,8 @@ export function apiFetch(getState, endpoint, { isBlob = false, isText = false, m
                 throw { id: "notFound" };
             } else if (response.status === 401 || response.status === 302) {
                 throw { id: "authError" };
+            } else if (response.status === 400) {
+                throw {...response.json()};
             }
             throw { id: "defaultError" };
         });

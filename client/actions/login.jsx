@@ -41,7 +41,62 @@ export const startRegistration = (email, password, name) => {
         })
     }
 }
-export const facebookLoginSuccessfulAsync = { }
+export const facebookLogin = (facebookResponse) => {
+    return (dispatch, getState) => {
+        dispatch({ type: 'START_LOGIN'});
+        apiPost(getState, 'auth/facebook', {
+            body: {
+                access_token:facebookResponse.token.accessToken
+            }
+        }).then(json => {
+            dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username: json.name });
+            if(getState().fs.project){
+                saveCompeteProject(dispatch, getState)
+            }
+        }).catch(error => {
+            console.log(error)
+            dispatch({ type: 'LOGIN_FAILED', error:error.id });
+        })
+    }
+}
+
+export const googleLogin = (googleResponse) => {
+    return (dispatch, getState) => {
+        dispatch({ type: 'START_LOGIN'});
+        apiPost(getState, 'auth/google', {
+            body: {
+                access_token:googleResponse.token.accessToken
+            }
+        }).then(json => {
+            dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username: json.name });
+            if(getState().fs.project){
+                saveCompeteProject(dispatch, getState)
+            }
+        }).catch(error => {
+            console.log(error)
+            dispatch({ type: 'LOGIN_FAILED', error:error.id });
+        })
+    }
+}
+
+export const githubLogin = (response) => {
+    return (dispatch, getState) => {
+        dispatch({ type: 'START_LOGIN'});
+        apiPost(getState, 'auth/github', {
+            body: {
+                access_token:response.accessToken
+            }
+        }).then(json => {
+            dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username: json.name });
+            if(getState().fs.project){
+                saveCompeteProject(dispatch, getState)
+            }
+        }).catch(error => {
+            console.log(error)
+            dispatch({ type: 'LOGIN_FAILED', error:error.id });
+        })
+    }
+}
 
 export const loginFailed = { }
 

@@ -3,19 +3,31 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Input from '../library/Input.jsx';
 import Modal from 'react-responsive-modal';
-import FacebookLogin from 'react-facebook-login';
+import GitHubLogin from 'react-github-login';
 import { Button } from 'antd';
+import SocialLogin from 'react-social-login'
+
+const SocialButton = SocialLogin(({ children, triggerLogin, socialClass, ...props }) => (
+    <li className={socialClass} onClick={triggerLogin} >
+        <a href="#"  {...props}>
+            { children }
+        </a>
+  </li>
+))
 
 import {
     startLogin,
-    facebookLoginSuccessfulAsync,
+    facebookLogin,
+    googleLogin,
+    githubLogin,
     loginFailed,
     hideLogin,
     startRegistration
 } from '../../actions/login.jsx';
 
 const errors = {
-    authError: "El usuario o contraseña son inválidos"
+    authError: "El usuario o contraseña son inválidos",
+    userAlreadyExist: "El emial ya existe.",
 }
 
 class Login extends Component {
@@ -27,7 +39,9 @@ class Login extends Component {
 
     componentDidMount() {
         this.setState({
-            fbAppId: (typeof window !== "undefined" && window.__CONFIG__ ? window.__CONFIG__.facebookAppId : this.props.params.siteConfig.facebookAppId)
+            fbAppId: (typeof window !== "undefined" && window.__CONFIG__ ? window.__CONFIG__.facebookAppId : this.props.params.siteConfig.facebookAppId),
+            googleClientId: (typeof window !== "undefined" && window.__CONFIG__ ? window.__CONFIG__.googleClientId : this.props.params.siteConfig.googleClientId),
+            githubClientId: (typeof window !== "undefined" && window.__CONFIG__ ? window.__CONFIG__.githubClientId : this.props.params.siteConfig.githubClientId)
         });
         setTimeout(() => {
             this.setState({
@@ -53,7 +67,7 @@ class Login extends Component {
     }
 
     handleLogin = () => {
-        this.props.dispatch(startLogin(this.state.username, this.state.password));
+        this.props.dispatch(startLogin(this.state.email, this.state.password));
     };
 
     handleRegister = () => {
@@ -70,15 +84,29 @@ class Login extends Component {
         this.refs.facebookLoginButton.click(ev);
     };
 
+    handleGithubLogin = (ev) => {
+        this.refs.githubLoginButton.click(ev);
+    };
 
     handleFacebookResponse = (fbResp) => {
-        if (fbResp.accessToken) {
-            this.props.dispatch(facebookLoginSuccessfulAsync(fbResp));
+        if (fbResp.token) {
+            this.props.dispatch(facebookLogin(fbResp));
         } else {
             this.props.dispatch(loginFailed({ id: "login.facebookLoginError", fbResp }));
         }
     };
 
+    onGoogleSuccess = (response) => {
+        this.props.dispatch(googleLogin(response));
+    }
+
+    onGithubSuccess = (response) => {
+        this.props.dispatch(githubLogin(response));
+    }
+
+    onGoogleFailure = (response) => {
+        
+    }
 
     onClose = () =>{
         this.props.dispatch(hideLogin())
@@ -86,7 +114,9 @@ class Login extends Component {
     }
 
     changeMode = (mode) => () =>{
-        this.setState({mode: mode})
+        var newMode = this.defaultState()
+        newMode.mode =  mode
+        this.setState(newMode)
     }
 
     loginContent(){
@@ -94,7 +124,7 @@ class Login extends Component {
             <div>
                 <h2>Ingresar</h2>
                 <div>
-                    <Input type="text" field="username" placeholder="E-mail" onChange={this.updateField('username')} value={this.state.username || ''}  focus={true}  className=""/>
+                    <Input type="text" field="email" placeholder="E-mail" onChange={this.updateField('email')} value={this.state.email || ''}  focus={true}  className=""/>
                     <Input type="password" field="password" onChange={this.updateField('password')} onEnter={this.handleLogin} placeholder="Contraseña" value={this.state.password || ''}  className=""/>
 
                       {
@@ -126,7 +156,7 @@ class Login extends Component {
             <div >
                 <h2>Registrate</h2>
                 <div>
-                    <Input type="text" field="email" placeholder="E-mail" onChange={this.updateField('email')} value={this.state.email || ''}  focus={true}  className=""/>
+                    <Input type="email" field="email" placeholder="E-mail" onChange={this.updateField('email')} value={this.state.email || ''}  focus={true}  className=""/>
                     <Input type="text" field="name" placeholder="Nombre" onChange={this.updateField('name')} value={this.state.name || ''}    className=""/>
                     <Input type="password" field="password" onChange={this.updateField('password')}  placeholder="Contraseña" value={this.state.password || ''}  className=""/>
                     <Input type="password" field="confirmPassword" onChange={this.updateField('confirmPassword')} onEnter={this.handleRegister} placeholder="Contraseña" value={this.state.confirmPassword || ''}  error={this.state.passwordError}  className=""/>
@@ -161,73 +191,53 @@ class Login extends Component {
             <Modal open={this.props.show} onClose={this.onClose} center classNames={ {modal:"modalContainer", closeButton: "close"} }  >    
                 <div className="log">
                     <div className="social w3ls animated fadeInDown delay05">
-                        <li className="f"> <a href="#"><img src="/public/images/fb.png" alt=""/></a> </li>
-                        <li className="t"><a href="#"><img src="/public/images/fb.png" alt=""/></a></li>
-                        <li className="p"><a href="#"><img src="/public/images/fb.png" alt=""/></a></li>
-                        <li className="i"><a href="#"><img src="/public/images/fb.png" alt=""/></a></li>
+
+                        <SocialButton
+                            provider='facebook'
+                            socialClass="facebook"
+                            appId={this.state.fbAppId}
+                            onLoginSuccess={this.handleFacebookResponse}
+                            onLoginFailure={this.onGoogleFailure}
+                        >
+                            <img className="socialImage" src="/public/images/fb.png" alt=""/>
+                        </SocialButton>
+
+                        <SocialButton
+                            provider='google'
+                            socialClass="google"
+                            appId={this.state.googleClientId}
+                            onLoginSuccess={this.onGoogleSuccess}
+                            onLoginFailure={this.onGoogleFailure}
+                        >
+                            <img  className="socialImage" src="/public/images/google.png" alt=""/>
+                        </SocialButton>
+                        
+                        
+                        <li className="twitter" onClick={ this.handleGithubLogin }><a href="#"><img  className="socialImage" src="/public/images/fb.png" alt=""/></a></li>
+                        <li className="instagram"><a href="#"><img  className="socialImage" src="/public/images/fb.png" alt=""/></a></li>
                         <div className="clear"></div>
                     </div>
                     <div className="content1 agileits animated fadeInUp delay1">
                         {this.state.mode == "login" && this.loginContent()}
                         {this.state.mode == "register" && this.registerContent()}
+
+
+                        {
+                            this.state.githubClientId && !this.props.inProgress &&
+                            <div style={{display: "none"}}>
+                                <GitHubLogin
+                                    ref="githubLoginButton"
+                                    clientId={this.state.githubClientId}
+                                    buttonText="Login"
+                                    onSuccess={this.onGithubSuccess}
+                                    onFailure={this.onGoogleFailure}
+                                />
+                            </div>
+                        }
                     </div>
                 </div>
             </Modal>
         )
-    }
-
-    render2() {
-        return (
-            <Modal open={this.props.show} onClose={this.onClose} center classNames={ {modal:"modalContainer", closeButton: "close"} }  >    
-                <div className="launcher">
-                    <div className="bg-login">
-                        <div className="login-container">
-                            <div>
-                                <div className="brand">
-                                    <img src="/public/wolloklogo.png" className="animated fadeInDown delay05" alt="Wollok" />
-                                </div>
-                                <div className="box animated ">
-                                    {
-                                        this.props.error && this.props.error.show &&
-                                        <div className="error">
-                                            <i></i>
-                                            <span>{I18n.t(this.props.error.label, { username: this.props.username })}</span>
-                                        </div>
-                                    }
-                                     
-                                        <Input type="text" field="username" className="form-control" placeholder="E-mail" onChange={this.updateField('username')} value={this.state.username || ''}  label="Username"/>
-                                        <Input type="password" field="password" onChange={this.updateField('password')} onKeyPress={this.handleKeyPress} className="form-control" placeholder="Contraseña" value={this.props.state || ''} label="Password"/>
-                                    
-
-                                        <Button
-                                            id="loginLink"
-                                            type="primary"
-                                            loading={this.props.inProgress}
-                                            className="btn btn-default btn-block"
-                                            onClick={ this.handleLogin }>
-                                            Ingresar
-                                        </Button>
-
-                                    
-                                    {
-                                        this.state.fbAppId && !this.props.inProgress && false &&
-                                        <FacebookLogin ref="facebookLoginButton"
-                                            appId={this.state.fbAppId}
-                                            autoLoad={false}
-                                            fields="name,email,picture"
-                                            scope="public_profile,email"
-                                            callback={this.handleFacebookResponse}
-                                            disableMobileRedirect={true}/>
-                                    }
-                                    
-                                </div>
-                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </Modal>
-        );
     }
 }
 

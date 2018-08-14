@@ -8,6 +8,8 @@ var defaultConfig = {
     "icon": "/public/wollok.png",
     "siteConfig": {
         "facebookAppId": "593194607741698",
+        "googleClientId": "280312481769-agp1icq91galpab7sb7sv5mqbugs35ae.apps.googleusercontent.com",
+        "githubClientId": "6a054b599ba023f6e75e"
     }
 };
 
