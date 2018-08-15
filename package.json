@@ -102,7 +102,6 @@
     "react-dnd": "^2.5.4",
     "react-dnd-html5-backend": "^2.5.4",
     "react-dom-factories": "^1.0.1",
-    "react-github-login": "^1.0.3",
     "react-icons": "^2.2.7",
     "react-redux-i18n": "^1.9.2",
     "react-responsive-modal": "^3.2.0",

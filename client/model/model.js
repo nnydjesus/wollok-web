@@ -109,6 +109,9 @@ export class Folder {
     }
 
     find(element){
+        if(element == undefined){
+            return this
+        }
         if(element.extension == 'directory'){
             return this.findFolderByPath(element.path+"/"+element.name)
         }else{

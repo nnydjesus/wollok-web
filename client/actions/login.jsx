@@ -11,7 +11,7 @@ export const startLogin = (email, password) => {
         }).then(json => {
             dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username: json.name });
             if(getState().fs.project){
-                saveCompeteProject(dispatch, getState)
+                saveCompeteProject(dispatch, getState, getState().fs.project.toJson())
             }
         }).catch(error => {
             console.log(error)
@@ -33,7 +33,7 @@ export const startRegistration = (email, password, name) => {
         }).then(json => {
             dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username:json.name });
             if(getState().fs.project){
-                saveCompeteProject(dispatch, getState)
+                saveCompeteProject(dispatch, getState, getState().fs.project.toJson())
             }
         }).catch(error => {
             console.log(error)
@@ -51,7 +51,7 @@ export const facebookLogin = (facebookResponse) => {
         }).then(json => {
             dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username: json.name });
             if(getState().fs.project){
-                saveCompeteProject(dispatch, getState)
+                saveCompeteProject(dispatch, getState, getState().fs.project.toJson())
             }
         }).catch(error => {
             console.log(error)
@@ -70,7 +70,7 @@ export const googleLogin = (googleResponse) => {
         }).then(json => {
             dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username: json.name });
             if(getState().fs.project){
-                saveCompeteProject(dispatch, getState)
+                saveCompeteProject(dispatch, getState, getState().fs.project.toJson())
             }
         }).catch(error => {
             console.log(error)
@@ -79,17 +79,20 @@ export const googleLogin = (googleResponse) => {
     }
 }
 
-export const githubLogin = (response) => {
+export const githubLogin = (code) => {
     return (dispatch, getState) => {
         dispatch({ type: 'START_LOGIN'});
-        apiPost(getState, 'auth/github', {
-            body: {
-                access_token:response.accessToken
+        apiGet(getState, 'auth/github/authenticate', {
+            params:{
+                code:code
             }
         }).then(json => {
+            history.pushState({}, null, "/");
             dispatch({ type: 'LOGIN_SUCCESSFUL', token:json.token, username: json.name });
-            if(getState().fs.project){
-                saveCompeteProject(dispatch, getState)
+            if(localStorage.hasOwnProperty("project")){
+                var project = JSON.parse(localStorage.getItem("project"))
+                localStorage.removeItem("project")
+                saveCompeteProject(dispatch, getState, project)
             }
         }).catch(error => {
             console.log(error)
@@ -122,10 +125,10 @@ export const hideLogin = () => {
     }
 }
 
-export const saveCompeteProject = (dispatch, getState) => {
+export const saveCompeteProject = (dispatch, getState, jsonProject) => {
     dispatch({ type: 'START_SAVE_COMPLETE_PROJECT' });
     apiPost(getState, 'projects/complete', {
-        body: getState().fs.project.toJson()
+        body: jsonProject
     }).then(json => {
         dispatch({ type: 'SAVE_COMPLETE_PROJECT_SUCCESSFUL', project:json });
     }).catch(error => {

@@ -18,8 +18,8 @@ export const createFolder = (folder) => {
 }
 
 export const updateFile = (file) => {
-    dispatch({ type: 'START_UPDATE_FILE' });
     return (dispatch, getState) => {
+        dispatch({ type: 'START_UPDATE_FILE' });
         apiPut(getState, 'files', {
             body: {
                 name:file.name,

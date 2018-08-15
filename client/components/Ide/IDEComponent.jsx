@@ -16,9 +16,10 @@ import localFileSystem from '../../actions/localFileSystem.jsx';
 import Login from '../login/Login.jsx';
 import Loader from '../library/Loader.jsx'
 
+import { githubLogin } from '../../actions/login.jsx';
 
 
-  const TabPane = Tabs.TabPane;
+const TabPane = Tabs.TabPane;
 
 class IDEComponent extends Component {
 
@@ -38,6 +39,12 @@ class IDEComponent extends Component {
             return remoteFileSystem
         }else{
             return localFileSystem
+        }
+    }
+
+    componentDidMount(){
+        if(this.props.router.location.query.rslCallback == "github" && this.props.router.location.query.code){
+            this.props.dispatch(githubLogin(this.props.router.location.query.code));
         }
     }
     

@@ -52,6 +52,7 @@ const fsReducer = (state = initialEventsState, action) => {
             project.compile()
             return {
                 ...state,
+                loading: false,
                 updates: 0,
                 project: project,
                 projects: [project],

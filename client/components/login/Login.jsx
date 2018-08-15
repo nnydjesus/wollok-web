@@ -3,17 +3,19 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Input from '../library/Input.jsx';
 import Modal from 'react-responsive-modal';
-import GitHubLogin from 'react-github-login';
 import { Button } from 'antd';
 import SocialLogin from 'react-social-login'
 
-const SocialButton = SocialLogin(({ children, triggerLogin, socialClass, ...props }) => (
-    <li className={socialClass} onClick={triggerLogin} >
+const SocialButton = SocialLogin(({ children, triggerLogin, socialClass, onClick, ...props }) => (
+    <li className={socialClass} onClick={onClick?onClick(triggerLogin):triggerLogin} >
         <a href="#"  {...props}>
             { children }
         </a>
   </li>
 ))
+
+const locationUrl = (typeof window !== "undefined"? window.location.href:"");
+
 
 import {
     startLogin,
@@ -100,8 +102,11 @@ class Login extends Component {
         this.props.dispatch(googleLogin(response));
     }
 
-    onGithubSuccess = (response) => {
-        this.props.dispatch(githubLogin(response));
+    onGithubClick = (triggerLogin) => (event)=> {
+        if(this.props.project){
+            localStorage.setItem("project", JSON.stringify(this.props.project))
+        }
+        triggerLogin(event)
     }
 
     onGoogleFailure = (response) => {
@@ -211,29 +216,27 @@ class Login extends Component {
                         >
                             <img  className="socialImage" src="/public/images/google.png" alt=""/>
                         </SocialButton>
+
+                        <SocialButton
+                            provider='github'
+                            socialClass="github"
+                            redirect={locationUrl}
+                            gatekeeper="gatekeeper"
+                            appId={this.state.githubClientId}
+                            onClick={this.onGithubClick}
+                            onLoginFailure={this.onGoogleFailure}
+                        >
+                            <img  className="socialImage" src="/public/images/github-logo.svg" alt=""/>
+                        </SocialButton>
                         
                         
                         <li className="twitter" onClick={ this.handleGithubLogin }><a href="#"><img  className="socialImage" src="/public/images/fb.png" alt=""/></a></li>
-                        <li className="instagram"><a href="#"><img  className="socialImage" src="/public/images/fb.png" alt=""/></a></li>
                         <div className="clear"></div>
                     </div>
                     <div className="content1 agileits animated fadeInUp delay1">
                         {this.state.mode == "login" && this.loginContent()}
                         {this.state.mode == "register" && this.registerContent()}
 
-
-                        {
-                            this.state.githubClientId && !this.props.inProgress &&
-                            <div style={{display: "none"}}>
-                                <GitHubLogin
-                                    ref="githubLoginButton"
-                                    clientId={this.state.githubClientId}
-                                    buttonText="Login"
-                                    onSuccess={this.onGithubSuccess}
-                                    onFailure={this.onGoogleFailure}
-                                />
-                            </div>
-                        }
                     </div>
                 </div>
             </Modal>
@@ -250,7 +253,8 @@ const mapStateToProps = (globalState) => {
         inProgress: globalState.login.inProgress,
         authToken: globalState.login.authToken,
         error: globalState.login.error,
-        show: globalState.login.showLogin
+        show: globalState.login.showLogin,
+        project: globalState.fs.project
     }
 };
 
